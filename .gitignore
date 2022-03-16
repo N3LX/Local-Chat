@@ -1,0 +1,12 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# Maven and its plugins
+target/
+dependency-reduced-pom.xml
+
+# IDEA
+.idea/*
