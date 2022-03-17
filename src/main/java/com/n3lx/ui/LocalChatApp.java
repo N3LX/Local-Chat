@@ -1,4 +1,4 @@
-package com.n3lx;
+package com.n3lx.ui;
 
 
 import javafx.application.Application;
