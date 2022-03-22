@@ -2,6 +2,7 @@ package com.n3lx.ui;
 
 
 import com.n3lx.ui.dialogwindows.ConnectionWindow;
+import com.n3lx.ui.dialogwindows.HostWindow;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -57,7 +58,10 @@ public class LocalChatApp extends Application {
         chatMenuItem1.setOnAction(actionEvent -> new ConnectionWindow(mainStage).getWindow().show());
 
         MenuItem chatMenuItem2 = new MenuItem("Disconnect");
+
         MenuItem chatMenuItem3 = new MenuItem("Host...");
+        chatMenuItem3.setOnAction(actionEvent -> new HostWindow(mainStage).getWindow().show());
+
         MenuItem chatMenuItem4 = new MenuItem("Stop hosting");
         chatMenu.getItems().addAll(chatMenuItem1, chatMenuItem2, new SeparatorMenuItem(), chatMenuItem3, chatMenuItem4);
 
