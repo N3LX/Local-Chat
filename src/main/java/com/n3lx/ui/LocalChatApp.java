@@ -3,6 +3,7 @@ package com.n3lx.ui;
 
 import com.n3lx.ui.dialogwindows.ConnectionWindow;
 import com.n3lx.ui.dialogwindows.HostWindow;
+import com.n3lx.ui.util.Preferences;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -27,6 +28,8 @@ public class LocalChatApp extends Application {
 
     private Stage mainStage;
 
+    private Scene mainScene;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -40,8 +43,8 @@ public class LocalChatApp extends Application {
         root.getChildren().add(createWindowContent());
         root.getChildren().forEach(node -> VBox.setVgrow(node, Priority.ALWAYS));
 
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
+        mainScene = new Scene(root);
+        stage.setScene(mainScene);
         stage.sizeToScene();
         stage.setMinHeight(WINDOW_MIN_HEIGHT);
         stage.setMinWidth(WINDOW_MIN_WIDTH);
@@ -49,7 +52,7 @@ public class LocalChatApp extends Application {
         stage.setTitle("Local Chat");
         //The icon won't be visible in the dock on MacOS but it will work on Windows and Linux
         stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icon.png")));
-        scene.getStylesheets().add("stylesheet.css");
+        mainScene.getStylesheets().addAll("stylesheet.css", Preferences.getThemeCssPath());
 
         stage.show();
     }
@@ -78,8 +81,32 @@ public class LocalChatApp extends Application {
         Menu settingsMenu = new Menu("Settings");
 
         Menu appearanceMenu = new Menu("Appearance");
+
         MenuItem appearanceMenuItem1 = new MenuItem("Light mode");
         MenuItem appearanceMenuItem2 = new MenuItem("Dark mode");
+
+        appearanceMenuItem1.setOnAction(actionEvent -> {
+            mainScene.getStylesheets().removeAll("stylesheet.css", Preferences.getThemeCssPath());
+            Preferences.setTheme(Preferences.THEME.LIGHT);
+            mainScene.getStylesheets().addAll("stylesheet.css", Preferences.getThemeCssPath());
+            appearanceMenuItem1.setDisable(true);
+            appearanceMenuItem2.setDisable(false);
+        });
+
+        appearanceMenuItem2.setOnAction(actionEvent -> {
+            mainScene.getStylesheets().removeAll("stylesheet.css", Preferences.getThemeCssPath());
+            Preferences.setTheme(Preferences.THEME.DARK);
+            mainScene.getStylesheets().addAll("stylesheet.css", Preferences.getThemeCssPath());
+            appearanceMenuItem2.setDisable(true);
+            appearanceMenuItem1.setDisable(false);
+        });
+
+        //Disable one of the buttons based on which theme was set on startup
+        switch (Preferences.getTheme()) {
+            case LIGHT -> appearanceMenuItem1.setDisable(true);
+            case DARK -> appearanceMenuItem2.setDisable(true);
+        }
+
         appearanceMenu.getItems().addAll(appearanceMenuItem1, appearanceMenuItem2);
 
         MenuItem settingsMenuItem1 = new MenuItem("Show timestamps");

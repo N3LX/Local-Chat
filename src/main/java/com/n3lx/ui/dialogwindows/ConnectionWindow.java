@@ -1,5 +1,6 @@
 package com.n3lx.ui.dialogwindows;
 
+import com.n3lx.ui.util.Preferences;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -43,7 +44,7 @@ public class ConnectionWindow extends DialogWindow {
         windowStage.setResizable(false);
 
         windowStage.setTitle("Connect to a server");
-        scene.getStylesheets().add("stylesheet.css");
+        scene.getStylesheets().addAll("stylesheet.css", Preferences.getThemeCssPath());
     }
 
     private void createServerSelectionRow(GridPane parentPane) {
