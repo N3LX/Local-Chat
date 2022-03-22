@@ -39,10 +39,12 @@ public class HostWindow extends DialogWindow {
         createButtonRow(windowContent);
 
         Scene scene = new Scene(windowContent);
-        windowStage.setTitle("Host a server");
         windowStage.setScene(scene);
         windowStage.sizeToScene();
         windowStage.setResizable(false);
+
+        windowStage.setTitle("Host a server");
+        scene.getStylesheets().add("stylesheet.css");
     }
 
     private void createServerNameRow(GridPane parentPane) {

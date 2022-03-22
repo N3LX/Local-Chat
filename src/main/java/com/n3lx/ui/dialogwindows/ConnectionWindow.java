@@ -38,10 +38,12 @@ public class ConnectionWindow extends DialogWindow {
         createButtonRow(windowContent);
 
         Scene scene = new Scene(windowContent);
-        windowStage.setTitle("Connect to a server");
         windowStage.setScene(scene);
         windowStage.sizeToScene();
         windowStage.setResizable(false);
+
+        windowStage.setTitle("Connect to a server");
+        scene.getStylesheets().add("stylesheet.css");
     }
 
     private void createServerSelectionRow(GridPane parentPane) {

@@ -49,6 +49,7 @@ public class LocalChatApp extends Application {
         stage.setTitle("Local Chat");
         //The icon won't be visible in the dock on MacOS but it will work on Windows and Linux
         stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icon.png")));
+        scene.getStylesheets().add("stylesheet.css");
 
         stage.show();
     }
