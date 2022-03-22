@@ -1,3 +1,7 @@
 *{
     -fx-font-family: Verdana;
 }
+
+.button {
+    -fx-background-radius: 5;
+}
