@@ -127,8 +127,11 @@ public class LocalChatApp extends Application {
 
     private HBox createMessageBox() {
         HBox messageBox = new HBox();
+        messageBox.setSpacing(5);
+
         TextField messageTextField = new TextField();
         Button sendButton = new Button("Send");
+        
         messageBox.getChildren().addAll(messageTextField, sendButton);
         messageBox.getChildren().forEach(node -> HBox.setHgrow(node, Priority.ALWAYS));
         return messageBox;
