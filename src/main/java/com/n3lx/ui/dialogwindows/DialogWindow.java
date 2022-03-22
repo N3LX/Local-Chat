@@ -23,6 +23,8 @@ public abstract class DialogWindow {
         windowStage.initModality(Modality.APPLICATION_MODAL);
     }
 
-    public abstract Stage getWindow();
+    public Stage getWindow() {
+        return windowStage;
+    }
 
 }

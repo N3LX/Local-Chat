@@ -22,11 +22,6 @@ public class ConnectionWindow extends DialogWindow {
         createUI();
     }
 
-    @Override
-    public Stage getWindow() {
-        return windowStage;
-    }
-
     private void createUI() {
         GridPane windowContent = new GridPane();
         windowContent.setVgap(VERTICAL_SPACING);
