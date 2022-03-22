@@ -19,7 +19,6 @@ public class LocalChatApp extends Application {
     private static final double WINDOW_MIN_WIDTH = 600;
     private static final double WINDOW_MIN_HEIGHT = 500;
     private static final double WINDOW_PADDING = 20;
-    private static final double CHAT_PANE_AND_USER_LIST_SPACING = 15;
 
     /**
      * This is a percentage value, should not exceed 100.
@@ -91,7 +90,7 @@ public class LocalChatApp extends Application {
 
     private GridPane createWindowContent() {
         GridPane windowContent = new GridPane();
-        windowContent.setHgap(CHAT_PANE_AND_USER_LIST_SPACING);
+        windowContent.setHgap(15);
         windowContent.setPadding(new Insets(WINDOW_PADDING));
 
         var columnConstraints = DoubleStream
@@ -131,7 +130,7 @@ public class LocalChatApp extends Application {
 
         TextField messageTextField = new TextField();
         Button sendButton = new Button("Send");
-        
+
         messageBox.getChildren().addAll(messageTextField, sendButton);
         messageBox.getChildren().forEach(node -> HBox.setHgrow(node, Priority.ALWAYS));
         return messageBox;
