@@ -1,6 +1,7 @@
 package com.n3lx.ui;
 
 
+import com.n3lx.ui.dialogwindows.ConnectionWindow;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,12 +24,16 @@ public class LocalChatApp extends Application {
      */
     private static final double CHAT_PANE_TO_USER_LIST_RATIO = 75;
 
+    private Stage mainStage;
+
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void start(Stage stage) throws Exception {
+        mainStage = stage;
+
         VBox root = new VBox();
         root.getChildren().add(createMenuBar());
         root.getChildren().add(createWindowContent());
@@ -47,7 +52,10 @@ public class LocalChatApp extends Application {
         var menuBar = new MenuBar();
 
         Menu chatMenu = new Menu("Chat");
+
         MenuItem chatMenuItem1 = new MenuItem("Connect...");
+        chatMenuItem1.setOnAction(actionEvent -> new ConnectionWindow(mainStage).getWindow().show());
+
         MenuItem chatMenuItem2 = new MenuItem("Disconnect");
         MenuItem chatMenuItem3 = new MenuItem("Host...");
         MenuItem chatMenuItem4 = new MenuItem("Stop hosting");
