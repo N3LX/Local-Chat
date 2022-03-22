@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
@@ -41,11 +42,15 @@ public class LocalChatApp extends Application {
         root.getChildren().forEach(node -> VBox.setVgrow(node, Priority.ALWAYS));
 
         Scene scene = new Scene(root);
-        stage.setTitle("Local Chat");
         stage.setScene(scene);
         stage.sizeToScene();
         stage.setMinHeight(WINDOW_MIN_HEIGHT);
         stage.setMinWidth(WINDOW_MIN_WIDTH);
+
+        stage.setTitle("Local Chat");
+        //The icon won't be visible in the dock on MacOS but it will work on Windows and Linux
+        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icon.png")));
+
         stage.show();
     }
 
