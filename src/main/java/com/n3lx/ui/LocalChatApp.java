@@ -127,6 +127,7 @@ public class LocalChatApp extends Application {
     private HBox createMessageBox() {
         HBox messageBox = new HBox();
         messageBox.setSpacing(5);
+        messageBox.setAlignment(Pos.CENTER);
 
         TextField messageTextField = new TextField();
         Button sendButton = new Button("Send");
