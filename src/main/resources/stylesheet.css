@@ -1,0 +1,45 @@
+*{
+    -fx-font-family: Verdana;
+}
+.menu{
+    -fx-font-size: 12;
+}
+
+.context-menu{
+    -fx-background-radius: 10;
+}
+
+.menu-bar{
+    -fx-background-radius: 10;
+}
+
+.menu-item{
+    -fx-background-radius: 10;
+}
+
+.menu{
+    -fx-background-radius: 10;
+}
+
+.button{
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+}
+
+.button:pressed{
+    -fx-opacity: 0.7;
+}
+
+.list-view{
+    -fx-background-radius: 10;
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+
+.text-field{
+    -fx-background-radius: 10;
+}
+
+.text-area .content{
+    -fx-background-radius: 10;
+}

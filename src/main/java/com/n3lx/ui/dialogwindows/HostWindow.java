@@ -1,5 +1,6 @@
 package com.n3lx.ui.dialogwindows;
 
+import com.n3lx.ui.util.Preferences;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -39,10 +40,12 @@ public class HostWindow extends DialogWindow {
         createButtonRow(windowContent);
 
         Scene scene = new Scene(windowContent);
-        windowStage.setTitle("Host a server");
         windowStage.setScene(scene);
         windowStage.sizeToScene();
         windowStage.setResizable(false);
+
+        windowStage.setTitle("Host a server");
+        scene.getStylesheets().addAll("stylesheet.css", Preferences.getThemeCssPath());
     }
 
     private void createServerNameRow(GridPane parentPane) {
