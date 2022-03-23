@@ -1,0 +1,51 @@
+*{
+    -fx-background : #222831;
+    -fx-text-fill: #EEEEEE;
+    -fx-highlight-color: #00ADB5;
+    -fx-secondary-color: #393E46;
+}
+
+.button{
+    -fx-background-color: -fx-secondary-color;
+    -fx-border-color: -fx-background;
+}
+
+.menu-bar {
+    -fx-background-color : -fx-background;
+}
+
+.context-menu{
+    -fx-background-color : -fx-background;
+}
+
+.menu {
+    -fx-background-color : -fx-background;
+}
+
+.menu:hover {
+    -fx-background-color : -fx-highlight-color;
+}
+
+.menu-item{
+    -fx-background-color : -fx-background;
+}
+
+.menu-item:hover{
+    -fx-background-color : -fx-highlight-color;
+}
+
+.list-view {
+    -fx-background-color: -fx-secondary-color;
+}
+
+.text-field{
+    -fx-background-color: -fx-secondary-color;
+}
+
+.text-area {
+    -fx-background-color: -fx-background;
+}
+
+.text-area .content{
+    -fx-background-color: -fx-secondary-color;
+}
