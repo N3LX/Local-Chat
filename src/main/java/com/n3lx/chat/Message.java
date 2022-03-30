@@ -46,6 +46,6 @@ public class Message implements Serializable {
     /*
         Enum that will allow the server/client classes to differentiate between end user and server-client communication
         */
-    enum MESSAGE_TYPE {STANDARD, ACTION}
+    public enum MESSAGE_TYPE {STANDARD, ACTION}
 
 }
