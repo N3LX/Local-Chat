@@ -3,6 +3,7 @@ package com.n3lx.chat;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class MessageTest {
 
@@ -16,6 +17,7 @@ public class MessageTest {
             assertEquals(message, m.getMessage());
             assertEquals(username, m.getUsername());
             assertEquals(messageType, m.getMessageType());
+            assertNotNull(m.getTimestamp());
         }
     }
 

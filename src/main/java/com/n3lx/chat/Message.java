@@ -1,13 +1,18 @@
 package com.n3lx.chat;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 /**
  * Objects of this class will be exchanged between client and server to allow for more complex communication.
  */
-public class Message {
+public class Message implements Serializable {
 
     private final String message;
 
     private final String username;
+
+    private final LocalDateTime timestamp;
 
     private final MESSAGE_TYPE messageType;
 
@@ -19,6 +24,7 @@ public class Message {
         this.message = message;
         this.username = username;
         this.messageType = messageType;
+        timestamp = LocalDateTime.now();
     }
 
     public String getMessage() {
@@ -33,9 +39,13 @@ public class Message {
         return messageType;
     }
 
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
     /*
-    Enum that will allow the server/client classes to differentiate between end user and server-client communication
-    */
+        Enum that will allow the server/client classes to differentiate between end user and server-client communication
+        */
     enum MESSAGE_TYPE {STANDARD, ACTION}
 
 }
