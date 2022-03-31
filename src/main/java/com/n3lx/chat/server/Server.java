@@ -21,7 +21,6 @@ public class Server {
     private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
 
     private final String serverName;
-    private final String userName;
     private final String welcomeMessage;
     private final ListView<String> chatBox;
     private final ListView<String> userListBox;
@@ -30,9 +29,8 @@ public class Server {
     private List<SocketStream> clients;
     private ExecutorService serverThreads;
 
-    public Server(String serverName, String userName, String welcomeMessage, ListView<String> chatBox, ListView<String> userList) {
+    public Server(String serverName, String welcomeMessage, ListView<String> chatBox, ListView<String> userList) {
         this.serverName = serverName;
-        this.userName = userName;
         this.welcomeMessage = welcomeMessage;
         this.chatBox = chatBox;
         this.userListBox = userList;

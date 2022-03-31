@@ -33,7 +33,6 @@ public class HostWindow extends DialogWindow {
         selectionPane.setVgap(VERTICAL_SPACING);
         selectionPane.setHgap(HORIZONTAL_SPACING);
         createServerNameRow(selectionPane);
-        createUsernameSetupRow(selectionPane);
         createServerMessageRow(selectionPane);
         windowContent.addColumn(0, selectionPane);
 
@@ -54,14 +53,6 @@ public class HostWindow extends DialogWindow {
 
         parentPane.addColumn(0, serverNameLabel);
         parentPane.addColumn(1, serverNameTextField);
-    }
-
-    private void createUsernameSetupRow(GridPane parentPane) {
-        Label usernameLabel = new Label("Your username");
-        TextField usernameTextField = new TextField();
-
-        parentPane.addColumn(0, usernameLabel);
-        parentPane.addColumn(1, usernameTextField);
     }
 
     private void createServerMessageRow(GridPane parentPane) {
