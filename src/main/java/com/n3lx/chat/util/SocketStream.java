@@ -1,4 +1,4 @@
-package com.n3lx.chat.server;
+package com.n3lx.chat.util;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,14 +8,14 @@ import java.net.Socket;
 /**
  * Class for allowing easier access to socket's input/output streams.
  */
-public class ClientStream {
+public class SocketStream {
 
     private Socket socket;
 
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
 
-    public ClientStream(Socket clientSocket) throws IOException {
+    public SocketStream(Socket clientSocket) throws IOException {
         socket = clientSocket;
         objectOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
         objectInputStream = new ObjectInputStream(clientSocket.getInputStream());

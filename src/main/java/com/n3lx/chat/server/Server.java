@@ -2,6 +2,7 @@ package com.n3lx.chat.server;
 
 import com.n3lx.chat.Message;
 import com.n3lx.chat.util.Settings;
+import com.n3lx.chat.util.SocketStream;
 import javafx.scene.control.ListView;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ public class Server {
     private final ListView<String> userListBox;
 
     private ServerSocket serverSocket;
-    private List<ClientStream> clients;
+    private List<SocketStream> clients;
     private ExecutorService serverThreads;
 
     public Server(String serverName, String userName, String welcomeMessage, ListView<String> chatBox, ListView<String> userList) {
@@ -59,7 +60,7 @@ public class Server {
                 Thread.sleep(10);
             }
 
-            for (ClientStream client : clients) {
+            for (SocketStream client : clients) {
                 client.close();
             }
         } catch (IOException e) {
@@ -77,7 +78,7 @@ public class Server {
             while (!serverSocket.isClosed()) {
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    ClientStream clientStream = new ClientStream(clientSocket);
+                    SocketStream clientStream = new SocketStream(clientSocket);
 
                     //TODO Implement handshake
 
@@ -96,13 +97,13 @@ public class Server {
         Runnable messageHandler = () -> {
             while (!serverSocket.isClosed()) {
                 synchronized (clients) {
-                    for (ClientStream client : clients) {
+                    for (SocketStream client : clients) {
                         try {
                             Message message = (Message) client.getObjectInputStream().readObject();
 
                             switch (message.getMessageType()) {
                                 case STANDARD:
-                                    for (ClientStream recipient : clients) {
+                                    for (SocketStream recipient : clients) {
                                         recipient.getObjectOutputStream().writeObject(message);
                                     }
                                     appendMessageToChatBox(message);
