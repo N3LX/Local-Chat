@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +25,7 @@ public class Server extends ChatMemberWithUIElements {
     private final String serverName;
     private final String welcomeMessage;
 
+    private final ReentrantLock clientStreamsLock;
     private ServerSocket serverSocket;
     private List<SocketStream> clientStreams;
     private ExecutorService serverThreads;
@@ -32,6 +34,7 @@ public class Server extends ChatMemberWithUIElements {
         super(chatBox, userListBox);
         this.serverName = serverName;
         this.welcomeMessage = welcomeMessage;
+        clientStreamsLock = new ReentrantLock(true);
     }
 
     public void start() {
@@ -88,14 +91,14 @@ public class Server extends ChatMemberWithUIElements {
                     Message clientResponse = (Message) clientStream.getObjectInputStream().readObject();
 
                     //Add client to the list and announce it to all clients
-                    synchronized (clientStreams) {
-                        clientStreams.add(clientStream);
+                    clientStreamsLock.lock();
 
-                        Message newUserAnnouncement = new Message(clientResponse.getUsername() + " joined the chat.",
-                                this.serverName, Message.MESSAGE_TYPE.STANDARD);
-                        clientStream.getObjectOutputStream().writeObject(newUserAnnouncement);
-                        appendMessageToChatBox(newUserAnnouncement);
-                    }
+                    clientStreams.add(clientStream);
+
+                    Message newUserAnnouncement = new Message(clientResponse.getUsername() + " joined the chat.",
+                            this.serverName, Message.MESSAGE_TYPE.STANDARD);
+                    clientStream.getObjectOutputStream().writeObject(newUserAnnouncement);
+                    appendMessageToChatBox(newUserAnnouncement);
 
                     //Update the user list box
                     var newUserListBox = new ListView<String>();
@@ -103,6 +106,8 @@ public class Server extends ChatMemberWithUIElements {
                     newUserListBox.getItems().add(clientResponse.getUsername());
                     updateLocalUserListBox(newUserListBox);
                     updateClientsUserListBox(newUserListBox);
+
+                    clientStreamsLock.unlock();
                 } catch (IOException | ClassNotFoundException ignored) {
 
                 }
@@ -115,45 +120,41 @@ public class Server extends ChatMemberWithUIElements {
         Runnable messageHandler = () -> {
             while (!serverSocket.isClosed()) {
                 try {
-                    synchronized (clientStreams) {
-                        for (SocketStream client : clientStreams) {
-                            Message message = (Message) client.getObjectInputStream().readObject();
+                    clientStreamsLock.lock();
+                    for (SocketStream client : clientStreams) {
+                        Message message = (Message) client.getObjectInputStream().readObject();
 
-                            switch (message.getMessageType()) {
-                                case STANDARD:
-                                    sendMessage(message);
-                                    appendMessageToChatBox(message);
-                                    break;
-                                case ACTION:
-                                    //TODO Implement special message handling
-                                    break;
-                            }
+                        switch (message.getMessageType()) {
+                            case STANDARD:
+                                sendMessage(message);
+                                appendMessageToChatBox(message);
+                                break;
+                            case ACTION:
+                                //TODO Implement special message handling
+                                break;
                         }
                     }
-                    //Sleep for a while so that the other threads contesting the client list can access it
-                    Thread.sleep(50);
+                    clientStreamsLock.unlock();
                 } catch (SocketTimeoutException ignored) {
                     //No activity on the socket, can proceed further
                 } catch (ClassNotFoundException | IOException e) {
                     LOGGER.log(Level.WARNING, "Could not parse incoming message", e);
-                } catch (InterruptedException ignored) {
-
                 }
             }
         };
         serverThreads.submit(messageHandler);
     }
 
-    private synchronized void sendMessage(Message message) {
-        synchronized (clientStreams) {
-            try {
-                for (SocketStream recipient : clientStreams) {
-                    recipient.getObjectOutputStream().writeObject(message);
-                }
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "An error has occurred when sending a message", e);
+    private void sendMessage(Message message) {
+        clientStreamsLock.lock();
+        try {
+            for (SocketStream recipient : clientStreams) {
+                recipient.getObjectOutputStream().writeObject(message);
             }
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "An error has occurred when sending a message", e);
         }
+        clientStreamsLock.unlock();
     }
 
     private synchronized void updateClientsUserListBox(ListView<String> newUserListBox) {
