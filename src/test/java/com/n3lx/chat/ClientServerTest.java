@@ -6,12 +6,14 @@ import javafx.scene.control.ListView;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
+import java.util.concurrent.TimeoutException;
+
 import static org.junit.Assert.assertEquals;
 
 public class ClientServerTest extends ApplicationTest {
 
     @Test
-    public void testHandshake() throws InterruptedException {
+    public void testHandshake() throws InterruptedException, TimeoutException {
         var serverChatBox = new ListView<String>();
         var serverUserListBox = new ListView<String>();
         var clientChatBox = new ListView<String>();
@@ -23,7 +25,15 @@ public class ClientServerTest extends ApplicationTest {
         server.start();
         client.start();
 
-        Thread.sleep(100);
+        //Wait up to 1s for handshake to happen
+        int attempts = 0;
+        while (clientChatBox.getItems().size() != 3 && attempts < 20) {
+            attempts++;
+            Thread.sleep(50);
+        }
+        if (attempts == 20) {
+            throw new TimeoutException("Initialization timeout");
+        }
 
         assertEquals(3, clientChatBox.getItems().size());
         assertEquals("Test server: Welcome to Test server", clientChatBox.getItems().get(0));
