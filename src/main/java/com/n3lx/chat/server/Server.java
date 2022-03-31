@@ -80,12 +80,26 @@ public class Server {
                     Socket clientSocket = serverSocket.accept();
                     SocketStream clientStream = new SocketStream(clientSocket);
 
-                    //TODO Implement handshake
+                    //Perform handshake with the client
+                    Message serverName = new Message("Welcome to " + this.serverName,
+                            this.serverName, Message.MESSAGE_TYPE.STANDARD);
+                    clientStream.getObjectOutputStream().writeObject(serverName);
+
+                    Message serverWelcomeMessage = new Message("Message of the day:\n" + welcomeMessage,
+                            this.serverName, Message.MESSAGE_TYPE.STANDARD);
+                    clientStream.getObjectOutputStream().writeObject(serverWelcomeMessage);
+
+                    Message clientResponse = (Message) clientStream.getObjectInputStream().readObject();
 
                     synchronized (clients) {
                         clients.add(clientStream);
                     }
-                } catch (IOException ignored) {
+
+                    Message newUserAnnouncement = new Message(clientResponse.getUsername() + " joined the chat.",
+                            this.serverName, Message.MESSAGE_TYPE.STANDARD);
+                    clientStream.getObjectOutputStream().writeObject(newUserAnnouncement);
+                    appendMessageToChatBox(newUserAnnouncement);
+                } catch (IOException | ClassNotFoundException ignored) {
 
                 }
             }
@@ -103,9 +117,7 @@ public class Server {
 
                             switch (message.getMessageType()) {
                                 case STANDARD:
-                                    for (SocketStream recipient : clients) {
-                                        recipient.getObjectOutputStream().writeObject(message);
-                                    }
+                                    sendMessage(message);
                                     appendMessageToChatBox(message);
                                     break;
                                 case ACTION:
@@ -119,15 +131,34 @@ public class Server {
                         }
                     }
                 }
+
+                //Sleep for a while so that the other threads contesting the client list can access it
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         };
         serverThreads.submit(messageHandler);
     }
 
-    private void appendMessageToChatBox(Message message) {
+    private synchronized void appendMessageToChatBox(Message message) {
         StringBuilder msg = new StringBuilder();
         msg.append(message.getUsername()).append(": ").append(message.getMessage());
         chatBox.getItems().add(msg.toString());
+    }
+
+    private synchronized void sendMessage(Message message) {
+        synchronized (clients) {
+            try {
+                for (SocketStream recipient : clients) {
+                    recipient.getObjectOutputStream().writeObject(message);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

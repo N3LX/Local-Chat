@@ -85,7 +85,18 @@ public class Client {
     }
 
     private void performHandshakeWithServer() {
-        //TODO Implement
+        try {
+            //Expect server to provide its name and welcome message
+            Message serverName = (Message) serverStream.getObjectInputStream().readObject();
+            Message serverWelcomeMessage = (Message) serverStream.getObjectInputStream().readObject();
+            appendMessageToChatBox(serverName);
+            appendMessageToChatBox(serverWelcomeMessage);
+
+            //Send an empty message so that the server can announce a new chat member
+            sendMessage("", Message.MESSAGE_TYPE.ACTION);
+        } catch (IOException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "An error has occurred during the handshake operation", e);
+        }
     }
 
     private void startMessageHandler() {
