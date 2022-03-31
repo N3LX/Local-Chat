@@ -110,7 +110,7 @@ public class Client {
                             appendMessageToChatBox(message);
                             break;
                         case ACTION:
-                            //TODO Implement special message handling
+                            processActionMessage(message);
                             break;
                     }
                 } catch (SocketTimeoutException ignored) {
@@ -123,14 +123,31 @@ public class Client {
         clientThreads.submit(messageHandler);
     }
 
+    private void processActionMessage(Message message) {
+        String action = message.getMessage().split(":")[0];
+        switch (action) {
+            case "userlistboxupdate":
+                String[] users = message.getMessage().split(":")[1].split(",");
+                var newUserListBox = new ListView<String>();
+                for (String user : users) {
+                    newUserListBox.getItems().add(user);
+                }
+                updateLocalUserListBox(newUserListBox);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown request was received from server.");
+        }
+    }
+
     private void appendMessageToChatBox(Message message) {
         StringBuilder msg = new StringBuilder();
         msg.append(message.getUsername()).append(": ").append(message.getMessage());
         chatBox.getItems().add(msg.toString());
     }
 
-    private void updateUserListBox(String users) {
-        //TODO Implement
+    private synchronized void updateLocalUserListBox(ListView<String> newUserListBox) {
+        userListBox.getItems().clear();
+        userListBox.getItems().addAll(newUserListBox.getItems());
     }
 
 }

@@ -95,10 +95,18 @@ public class Server {
                         clients.add(clientStream);
                     }
 
+                    //Announce the client to all chat members
                     Message newUserAnnouncement = new Message(clientResponse.getUsername() + " joined the chat.",
                             this.serverName, Message.MESSAGE_TYPE.STANDARD);
                     clientStream.getObjectOutputStream().writeObject(newUserAnnouncement);
                     appendMessageToChatBox(newUserAnnouncement);
+
+                    //Update the user list box
+                    var newUserListBox = new ListView<String>();
+                    newUserListBox.getItems().addAll(userListBox.getItems());
+                    newUserListBox.getItems().add(clientResponse.getUsername());
+                    updateLocalUserListBox(newUserListBox);
+                    updateClientsUserListBox(newUserListBox);
                 } catch (IOException | ClassNotFoundException ignored) {
 
                 }
@@ -159,6 +167,21 @@ public class Server {
                 e.printStackTrace();
             }
         }
+    }
+
+    private synchronized void updateLocalUserListBox(ListView<String> newUserListBox) {
+        userListBox.getItems().clear();
+        userListBox.getItems().addAll(newUserListBox.getItems());
+    }
+
+    private synchronized void updateClientsUserListBox(ListView<String> newUserListBox) {
+        StringBuilder messageContents = new StringBuilder();
+        messageContents.append("userlistboxupdate:");
+        for (String user : newUserListBox.getItems()) {
+            messageContents.append(user).append(",");
+        }
+        Message updateMessage = new Message(messageContents.toString(), serverName, Message.MESSAGE_TYPE.ACTION);
+        sendMessage(updateMessage);
     }
 
 }

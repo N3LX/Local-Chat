@@ -33,6 +33,12 @@ public class ClientServerTest extends ApplicationTest {
         assertEquals(1, serverChatBox.getItems().size());
         assertEquals("Test server: Client joined the chat.", serverChatBox.getItems().get(0));
 
+        assertEquals(1, serverUserListBox.getItems().size());
+        assertEquals("Client", serverUserListBox.getItems().get(0));
+
+        assertEquals(1, clientUserListBox.getItems().size());
+        assertEquals("Client", clientUserListBox.getItems().get(0));
+
         server.stop();
         client.stop();
     }
