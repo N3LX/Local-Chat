@@ -17,7 +17,7 @@ public class ClientServerTest extends ApplicationTest {
         var clientChatBox = new ListView<String>();
         var clientUserListBox = new ListView<String>();
 
-        Server server = new Server("Test server", "Admin", serverChatBox, serverUserListBox);
+        Server server = new Server("Test server", "", serverChatBox, serverUserListBox);
         Client client = new Client("localhost", "Client", clientChatBox, clientUserListBox);
 
         server.start();

@@ -1,5 +1,6 @@
 package com.n3lx.chat.client;
 
+import com.n3lx.chat.ChatMemberWithUIElements;
 import com.n3lx.chat.Message;
 import com.n3lx.chat.server.Server;
 import com.n3lx.chat.util.Settings;
@@ -14,24 +15,21 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Client {
+public class Client extends ChatMemberWithUIElements {
 
     private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
 
     private final String userName;
     private final String ipAddress;
-    private final ListView<String> chatBox;
-    private final ListView<String> userListBox;
 
     private Socket socket;
     private SocketStream serverStream;
     private ExecutorService clientThreads;
 
     public Client(String ipAddress, String userName, ListView<String> chatBox, ListView<String> userListBox) {
+        super(chatBox, userListBox);
         this.ipAddress = ipAddress;
         this.userName = userName;
-        this.chatBox = chatBox;
-        this.userListBox = userListBox;
     }
 
     public void start() {
@@ -137,17 +135,6 @@ public class Client {
             default:
                 throw new UnsupportedOperationException("Unknown request was received from server.");
         }
-    }
-
-    private void appendMessageToChatBox(Message message) {
-        StringBuilder msg = new StringBuilder();
-        msg.append(message.getUsername()).append(": ").append(message.getMessage());
-        chatBox.getItems().add(msg.toString());
-    }
-
-    private synchronized void updateLocalUserListBox(ListView<String> newUserListBox) {
-        userListBox.getItems().clear();
-        userListBox.getItems().addAll(newUserListBox.getItems());
     }
 
 }

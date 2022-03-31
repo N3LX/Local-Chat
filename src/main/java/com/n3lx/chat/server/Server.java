@@ -1,5 +1,6 @@
 package com.n3lx.chat.server;
 
+import com.n3lx.chat.ChatMemberWithUIElements;
 import com.n3lx.chat.Message;
 import com.n3lx.chat.util.Settings;
 import com.n3lx.chat.util.SocketStream;
@@ -16,24 +17,21 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Server {
+public class Server extends ChatMemberWithUIElements {
 
     private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
 
     private final String serverName;
     private final String welcomeMessage;
-    private final ListView<String> chatBox;
-    private final ListView<String> userListBox;
 
     private ServerSocket serverSocket;
     private List<SocketStream> clients;
     private ExecutorService serverThreads;
 
-    public Server(String serverName, String welcomeMessage, ListView<String> chatBox, ListView<String> userList) {
+    public Server(String serverName, String welcomeMessage, ListView<String> chatBox, ListView<String> userListBox) {
+        super(chatBox, userListBox);
         this.serverName = serverName;
         this.welcomeMessage = welcomeMessage;
-        this.chatBox = chatBox;
-        this.userListBox = userList;
     }
 
     public void start() {
@@ -149,12 +147,6 @@ public class Server {
         serverThreads.submit(messageHandler);
     }
 
-    private synchronized void appendMessageToChatBox(Message message) {
-        StringBuilder msg = new StringBuilder();
-        msg.append(message.getUsername()).append(": ").append(message.getMessage());
-        chatBox.getItems().add(msg.toString());
-    }
-
     private synchronized void sendMessage(Message message) {
         synchronized (clients) {
             try {
@@ -165,11 +157,6 @@ public class Server {
                 e.printStackTrace();
             }
         }
-    }
-
-    private synchronized void updateLocalUserListBox(ListView<String> newUserListBox) {
-        userListBox.getItems().clear();
-        userListBox.getItems().addAll(newUserListBox.getItems());
     }
 
     private synchronized void updateClientsUserListBox(ListView<String> newUserListBox) {
