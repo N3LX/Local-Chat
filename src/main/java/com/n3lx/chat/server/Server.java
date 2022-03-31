@@ -25,7 +25,7 @@ public class Server extends ChatMemberWithUIElements {
     private final String welcomeMessage;
 
     private ServerSocket serverSocket;
-    private List<SocketStream> clients;
+    private List<SocketStream> clientStreams;
     private ExecutorService serverThreads;
 
     public Server(String serverName, String welcomeMessage, ListView<String> chatBox, ListView<String> userListBox) {
@@ -38,7 +38,7 @@ public class Server extends ChatMemberWithUIElements {
         try {
             serverSocket = new ServerSocket(Settings.PORT);
             serverThreads = Executors.newCachedThreadPool();
-            clients = new LinkedList<>();
+            clientStreams = new LinkedList<>();
 
             startIncomingConnectionHandler();
             startMessageHandler();
@@ -56,7 +56,7 @@ public class Server extends ChatMemberWithUIElements {
                 Thread.sleep(10);
             }
 
-            for (SocketStream client : clients) {
+            for (SocketStream client : clientStreams) {
                 client.close();
             }
         } catch (IOException e) {
@@ -87,15 +87,15 @@ public class Server extends ChatMemberWithUIElements {
 
                     Message clientResponse = (Message) clientStream.getObjectInputStream().readObject();
 
-                    synchronized (clients) {
-                        clients.add(clientStream);
-                    }
+                    //Add client to the list and announce it to all clients
+                    synchronized (clientStreams) {
+                        clientStreams.add(clientStream);
 
-                    //Announce the client to all chat members
-                    Message newUserAnnouncement = new Message(clientResponse.getUsername() + " joined the chat.",
-                            this.serverName, Message.MESSAGE_TYPE.STANDARD);
-                    clientStream.getObjectOutputStream().writeObject(newUserAnnouncement);
-                    appendMessageToChatBox(newUserAnnouncement);
+                        Message newUserAnnouncement = new Message(clientResponse.getUsername() + " joined the chat.",
+                                this.serverName, Message.MESSAGE_TYPE.STANDARD);
+                        clientStream.getObjectOutputStream().writeObject(newUserAnnouncement);
+                        appendMessageToChatBox(newUserAnnouncement);
+                    }
 
                     //Update the user list box
                     var newUserListBox = new ListView<String>();
@@ -114,9 +114,9 @@ public class Server extends ChatMemberWithUIElements {
     private void startMessageHandler() {
         Runnable messageHandler = () -> {
             while (!serverSocket.isClosed()) {
-                synchronized (clients) {
-                    for (SocketStream client : clients) {
-                        try {
+                try {
+                    synchronized (clientStreams) {
+                        for (SocketStream client : clientStreams) {
                             Message message = (Message) client.getObjectInputStream().readObject();
 
                             switch (message.getMessageType()) {
@@ -128,19 +128,16 @@ public class Server extends ChatMemberWithUIElements {
                                     //TODO Implement special message handling
                                     break;
                             }
-                        } catch (SocketTimeoutException ignored) {
-                            //No activity on the socket, can proceed further
-                        } catch (ClassNotFoundException | IOException e) {
-                            LOGGER.log(Level.WARNING, "Could not parse incoming message", e);
                         }
                     }
-                }
-
-                //Sleep for a while so that the other threads contesting the client list can access it
-                try {
+                    //Sleep for a while so that the other threads contesting the client list can access it
                     Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } catch (SocketTimeoutException ignored) {
+                    //No activity on the socket, can proceed further
+                } catch (ClassNotFoundException | IOException e) {
+                    LOGGER.log(Level.WARNING, "Could not parse incoming message", e);
+                } catch (InterruptedException ignored) {
+
                 }
             }
         };
@@ -148,13 +145,13 @@ public class Server extends ChatMemberWithUIElements {
     }
 
     private synchronized void sendMessage(Message message) {
-        synchronized (clients) {
+        synchronized (clientStreams) {
             try {
-                for (SocketStream recipient : clients) {
+                for (SocketStream recipient : clientStreams) {
                     recipient.getObjectOutputStream().writeObject(message);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.WARNING, "An error has occurred when sending a message", e);
             }
         }
     }

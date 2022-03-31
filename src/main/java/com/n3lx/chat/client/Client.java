@@ -64,10 +64,9 @@ public class Client extends ChatMemberWithUIElements {
         }
     }
 
-    private void sendMessage(String message, Message.MESSAGE_TYPE messageType) {
+    private void sendMessage(Message message) {
         try {
-            Message msg = new Message(message, userName, Message.MESSAGE_TYPE.STANDARD);
-            serverStream.getObjectOutputStream().writeObject(msg);
+            serverStream.getObjectOutputStream().writeObject(message);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "An error has occurred during sending a message to the server", e);
         }
@@ -91,7 +90,7 @@ public class Client extends ChatMemberWithUIElements {
             appendMessageToChatBox(serverWelcomeMessage);
 
             //Send an empty message so that the server can announce a new chat member
-            sendMessage("", Message.MESSAGE_TYPE.ACTION);
+            sendMessage(new Message("", userName, Message.MESSAGE_TYPE.ACTION));
         } catch (IOException | ClassNotFoundException e) {
             LOGGER.log(Level.SEVERE, "An error has occurred during the handshake operation", e);
         }
