@@ -24,7 +24,7 @@ public class Client {
     private final ListView<String> userListBox;
 
     private Socket socket;
-    private SocketStream server;
+    private SocketStream serverStream;
     private ExecutorService clientThreads;
 
     public Client(String ipAddress, String userName, ListView<String> chatBox, ListView<String> userListBox) {
@@ -44,7 +44,7 @@ public class Client {
 
     public void stop() {
         try {
-            server.close();
+            serverStream.close();
             clientThreads.shutdown();
 
             while (!clientThreads.isTerminated()) {
@@ -60,7 +60,7 @@ public class Client {
     public void sendMessage(String message) {
         try {
             Message msg = new Message(message, userName, Message.MESSAGE_TYPE.STANDARD);
-            server.getObjectOutputStream().writeObject(msg);
+            serverStream.getObjectOutputStream().writeObject(msg);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "An error has occurred during sending a message to the server", e);
         }
@@ -69,7 +69,7 @@ public class Client {
     private void sendMessage(String message, Message.MESSAGE_TYPE messageType) {
         try {
             Message msg = new Message(message, userName, Message.MESSAGE_TYPE.STANDARD);
-            server.getObjectOutputStream().writeObject(msg);
+            serverStream.getObjectOutputStream().writeObject(msg);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "An error has occurred during sending a message to the server", e);
         }
@@ -78,7 +78,7 @@ public class Client {
     private void connect() {
         try {
             socket = new Socket(ipAddress, Settings.PORT);
-            server = new SocketStream(socket);
+            serverStream = new SocketStream(socket);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "An error has occurred when attempting to connect to the server", e);
         }
@@ -92,7 +92,7 @@ public class Client {
         Runnable messageHandler = () -> {
             while (!socket.isClosed()) {
                 try {
-                    Message message = (Message) server.getObjectInputStream().readObject();
+                    Message message = (Message) serverStream.getObjectInputStream().readObject();
 
                     switch (message.getMessageType()) {
                         case STANDARD:
