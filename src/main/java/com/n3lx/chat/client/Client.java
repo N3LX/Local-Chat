@@ -9,6 +9,7 @@ import javafx.scene.control.ListView;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -114,6 +115,9 @@ public class Client extends ChatMemberWithUIElements {
                     }
                 } catch (SocketTimeoutException ignored) {
                     //No activity on the socket, can proceed further
+                } catch (SocketException ignored) {
+                    //This only happens when close() has been called
+                    //and the messageHandler didn't have a chance to register it.
                 } catch (ClassNotFoundException | IOException e) {
                     LOGGER.log(Level.WARNING, "Could not parse incoming message", e);
                 }
