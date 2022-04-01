@@ -90,7 +90,7 @@ public class Client extends ChatMemberWithUIElements {
             appendMessageToChatBox(serverWelcomeMessage);
 
             //Send an empty message so that the server can announce a new chat member
-            sendMessage(new Message("", userName, Message.MESSAGE_TYPE.ACTION));
+            sendMessage(new Message("Handshake success", userName, Message.MESSAGE_TYPE.ACTION));
         } catch (IOException | ClassNotFoundException e) {
             LOGGER.log(Level.SEVERE, "An error has occurred during the handshake operation", e);
         }

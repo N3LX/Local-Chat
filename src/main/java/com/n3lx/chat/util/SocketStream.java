@@ -15,10 +15,10 @@ public class SocketStream {
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
 
-    public SocketStream(Socket clientSocket) throws IOException {
-        socket = clientSocket;
-        objectOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-        objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
+    public SocketStream(Socket socket) throws IOException {
+        this.socket = socket;
+        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        objectInputStream = new ObjectInputStream(socket.getInputStream());
         socket.setSoTimeout(300);
     }
 
