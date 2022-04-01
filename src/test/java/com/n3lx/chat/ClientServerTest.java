@@ -2,6 +2,7 @@ package com.n3lx.chat;
 
 import com.n3lx.chat.client.Client;
 import com.n3lx.chat.server.Server;
+import com.n3lx.chat.util.serverscanner.ServerScanner;
 import javafx.scene.control.ListView;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
@@ -40,8 +41,10 @@ public class ClientServerTest extends ApplicationTest {
         assertEquals("Test server: Message of the day:\n", clientChatBox.getItems().get(1));
         assertEquals("Test server: Client joined the chat.", clientChatBox.getItems().get(2));
 
-        assertEquals(1, serverChatBox.getItems().size());
-        assertEquals("Test server: Client joined the chat.", serverChatBox.getItems().get(0));
+        assertEquals(2, serverChatBox.getItems().size());
+        assertEquals("Test server: Server has started, your IP is: " + ServerScanner.getLocalhostIP()
+                , serverChatBox.getItems().get(0));
+        assertEquals("Test server: Client joined the chat.", serverChatBox.getItems().get(1));
 
         assertEquals(1, serverUserListBox.getItems().size());
         assertEquals("Client", serverUserListBox.getItems().get(0));

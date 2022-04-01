@@ -4,6 +4,7 @@ import com.n3lx.chat.ChatMemberWithUIElements;
 import com.n3lx.chat.Message;
 import com.n3lx.chat.util.Settings;
 import com.n3lx.chat.util.SocketStream;
+import com.n3lx.chat.util.serverscanner.ServerScanner;
 import javafx.scene.control.ListView;
 
 import java.io.IOException;
@@ -45,6 +46,11 @@ public class Server extends ChatMemberWithUIElements {
 
             startIncomingConnectionHandler();
             startMessageHandler();
+
+            //Inform user about successful startup
+            appendMessageToChatBox(new Message("Server has started, your IP is: " + ServerScanner.getLocalhostIP()
+                    , this.serverName
+                    , Message.MESSAGE_TYPE.STANDARD));
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "An error has occurred during server startup", e);
         }
