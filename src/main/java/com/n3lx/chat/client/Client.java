@@ -5,6 +5,7 @@ import com.n3lx.chat.Message;
 import com.n3lx.chat.server.Server;
 import com.n3lx.chat.util.Settings;
 import com.n3lx.chat.util.SocketStream;
+import javafx.application.Platform;
 import javafx.scene.control.ListView;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class Client extends ChatMemberWithUIElements {
             LOGGER.log(Level.WARNING, "An error has occurred when attempting to disconnect from the server", e);
         } finally {
             //Empty connected users list box
-            userListBox.getItems().clear();
+            Platform.runLater(() -> userListBox.getItems().clear());
         }
     }
 

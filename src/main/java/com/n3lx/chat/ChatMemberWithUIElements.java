@@ -1,5 +1,6 @@
 package com.n3lx.chat;
 
+import javafx.application.Platform;
 import javafx.scene.control.ListView;
 
 public abstract class ChatMemberWithUIElements {
@@ -19,13 +20,19 @@ public abstract class ChatMemberWithUIElements {
         this.userListBox = userList;
     }
 
+    public abstract void start();
+
+    public abstract void stop();
+
     protected synchronized void updateLocalUserListBox(ListView<String> newUserListBox) {
-        userListBox.getItems().clear();
-        userListBox.getItems().addAll(newUserListBox.getItems());
+        Platform.runLater(() -> {
+            userListBox.getItems().clear();
+            userListBox.getItems().addAll(newUserListBox.getItems());
+        });
     }
 
     protected void appendMessageToChatBox(Message message) {
-        chatBox.getItems().add(message.getUsername() + ": " + message.getMessage());
+        Platform.runLater(() -> chatBox.getItems().add(message.getUsername() + ": " + message.getMessage()));
     }
 
 }

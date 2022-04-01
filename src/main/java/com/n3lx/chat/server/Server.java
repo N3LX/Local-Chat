@@ -5,6 +5,7 @@ import com.n3lx.chat.Message;
 import com.n3lx.chat.util.Settings;
 import com.n3lx.chat.util.SocketStream;
 import com.n3lx.chat.util.serverscanner.ServerScanner;
+import javafx.application.Platform;
 import javafx.scene.control.ListView;
 
 import java.io.IOException;
@@ -79,7 +80,7 @@ public class Server extends ChatMemberWithUIElements {
             clientStreamsLock.unlock();
 
             //Empty connected users list box
-            userListBox.getItems().clear();
+            Platform.runLater(() -> userListBox.getItems().clear());
         }
     }
 
