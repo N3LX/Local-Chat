@@ -51,6 +51,8 @@ public class Client extends ChatMemberWithUIElements {
             while (!clientThreads.isTerminated()) {
                 Thread.sleep(10);
             }
+        } catch (SocketException ignored) {
+            //This only happens when server has been closed and can be safely ignored
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "An error has occurred when attempting to disconnect from the server", e);
         } catch (InterruptedException ignored) {
@@ -70,6 +72,8 @@ public class Client extends ChatMemberWithUIElements {
     private void sendMessage(Message message) {
         try {
             serverStream.getObjectOutputStream().writeObject(message);
+        } catch (SocketException ignored) {
+            //This only happens when server has been closed and can be safely ignored
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "An error has occurred during sending a message to the server", e);
         }
@@ -79,6 +83,8 @@ public class Client extends ChatMemberWithUIElements {
         try {
             socket = new Socket(ipAddress, Settings.PORT);
             serverStream = new SocketStream(socket);
+        } catch (SocketException ignored) {
+            //This only happens when server has been closed and can be safely ignored
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "An error has occurred when attempting to connect to the server", e);
         }
@@ -136,6 +142,9 @@ public class Client extends ChatMemberWithUIElements {
                     newUserListBox.getItems().add(user);
                 }
                 updateLocalUserListBox(newUserListBox);
+                break;
+            case "shutdown":
+                stop();
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown request was received from server.");

@@ -26,15 +26,8 @@ public class ClientServerTest extends ApplicationTest {
         server.start();
         client.start();
 
-        //Wait up to 1s for handshake to happen
-        int attempts = 0;
-        while (clientChatBox.getItems().size() != 3 && attempts < 20) {
-            attempts++;
-            Thread.sleep(50);
-        }
-        if (attempts == 20) {
-            throw new TimeoutException("Initialization timeout");
-        }
+        //Wait for 300ms for handshake to happen
+        Thread.sleep(300);
 
         assertEquals(3, clientChatBox.getItems().size());
         assertEquals("Test server: Welcome to Test server", clientChatBox.getItems().get(0));
@@ -69,27 +62,13 @@ public class ClientServerTest extends ApplicationTest {
         server.start();
         client.start();
 
-        //Wait up to 1s for handshake to happen
-        int attempts = 0;
-        while (clientChatBox.getItems().size() != 3 && attempts < 20) {
-            attempts++;
-            Thread.sleep(50);
-        }
-        if (attempts == 20) {
-            throw new TimeoutException("Initialization timeout");
-        }
+        //Wait for 300ms for handshake to happen
+        Thread.sleep(300);
 
         client.stop();
 
-        //Wait up to 200ms for server to register that client has disconnected
-        attempts = 0;
-        while (clientChatBox.getItems().size() != 3 && attempts < 20) {
-            attempts++;
-            Thread.sleep(10);
-        }
-        if (attempts == 20) {
-            throw new TimeoutException("Initialization timeout");
-        }
+        //Wait for 200ms for server to register that client has disconnected
+        Thread.sleep(200);
 
         assertEquals(3, serverChatBox.getItems().size());
         assertEquals("Test server: Server has started, your IP is: " + ServerScanner.getLocalhostIP()
@@ -100,6 +79,36 @@ public class ClientServerTest extends ApplicationTest {
         assertEquals(0, serverUserListBox.getItems().size());
 
         server.stop();
+    }
+
+    @Test
+    public void testServerSideDisconnection() throws InterruptedException, TimeoutException {
+        var serverChatBox = new ListView<String>();
+        var serverUserListBox = new ListView<String>();
+        var clientChatBox = new ListView<String>();
+        var clientUserListBox = new ListView<String>();
+
+        Server server = new Server("Test server", "", serverChatBox, serverUserListBox);
+        Client client = new Client("localhost", "Client", clientChatBox, clientUserListBox);
+
+        server.start();
+        client.start();
+
+        //Wait for 300ms for handshake to happen
+        Thread.sleep(300);
+
+        server.stop();
+
+        //Wait for 200ms for server to register that client has disconnected
+        Thread.sleep(200);
+
+        assertEquals(4, clientChatBox.getItems().size());
+        assertEquals("Test server: Welcome to Test server", clientChatBox.getItems().get(0));
+        assertEquals("Test server: Message of the day:\n", clientChatBox.getItems().get(1));
+        assertEquals("Test server: Client joined the chat.", clientChatBox.getItems().get(2));
+        assertEquals("Test server: Server will shut down shortly", clientChatBox.getItems().get(3));
+
+        client.stop();
     }
 
 }

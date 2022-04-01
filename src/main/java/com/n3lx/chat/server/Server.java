@@ -57,6 +57,10 @@ public class Server extends ChatMemberWithUIElements {
 
     public void stop() {
         try {
+            //Inform the connected clients about shutdown
+            sendMessage(new Message("Server will shut down shortly", serverName, Message.MESSAGE_TYPE.STANDARD));
+            sendMessage(new Message("shutdown:", serverName, Message.MESSAGE_TYPE.ACTION));
+
             serverThreads.shutdown();
             serverSocket.close();
 
