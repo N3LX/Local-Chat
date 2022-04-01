@@ -90,24 +90,27 @@ public class Server extends ChatMemberWithUIElements {
 
                     Message clientResponse = (Message) clientStream.getObjectInputStream().readObject();
 
-                    //Add client to the list and announce it to all clients
-                    clientStreamsLock.lock();
+                    //Check if the response matches what is expected of a Client instance
+                    if (clientResponse.getMessage().equals("Handshake success")) {
+                        //Add client to the list and announce it to all clients
+                        clientStreamsLock.lock();
 
-                    clientStreams.add(clientStream);
+                        clientStreams.add(clientStream);
 
-                    Message newUserAnnouncement = new Message(clientResponse.getUsername() + " joined the chat.",
-                            this.serverName, Message.MESSAGE_TYPE.STANDARD);
-                    clientStream.getObjectOutputStream().writeObject(newUserAnnouncement);
-                    appendMessageToChatBox(newUserAnnouncement);
+                        Message newUserAnnouncement = new Message(clientResponse.getUsername() + " joined the chat.",
+                                this.serverName, Message.MESSAGE_TYPE.STANDARD);
+                        clientStream.getObjectOutputStream().writeObject(newUserAnnouncement);
+                        appendMessageToChatBox(newUserAnnouncement);
 
-                    //Update the user list box
-                    var newUserListBox = new ListView<String>();
-                    newUserListBox.getItems().addAll(userListBox.getItems());
-                    newUserListBox.getItems().add(clientResponse.getUsername());
-                    updateLocalUserListBox(newUserListBox);
-                    updateClientsUserListBox(newUserListBox);
+                        //Update the user list box
+                        var newUserListBox = new ListView<String>();
+                        newUserListBox.getItems().addAll(userListBox.getItems());
+                        newUserListBox.getItems().add(clientResponse.getUsername());
+                        updateLocalUserListBox(newUserListBox);
+                        updateClientsUserListBox(newUserListBox);
 
-                    clientStreamsLock.unlock();
+                        clientStreamsLock.unlock();
+                    }
                 } catch (IOException | ClassNotFoundException ignored) {
 
                 }
