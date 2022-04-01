@@ -99,7 +99,7 @@ public class ClientServerTest extends ApplicationTest {
 
         server.stop();
 
-        //Wait for 200ms for server to register that client has disconnected
+        //Wait for 200ms for client to register that server has disconnected
         Thread.sleep(200);
 
         assertEquals(4, clientChatBox.getItems().size());
@@ -109,6 +109,29 @@ public class ClientServerTest extends ApplicationTest {
         assertEquals("Test server: Server will shut down shortly", clientChatBox.getItems().get(3));
 
         client.stop();
+    }
+
+    @Test
+    public void testUserListBoxAfterInvokingStopMethod() throws InterruptedException {
+        var serverChatBox = new ListView<String>();
+        var serverUserListBox = new ListView<String>();
+        var clientChatBox = new ListView<String>();
+        var clientUserListBox = new ListView<String>();
+
+        Server server = new Server("Test server", "", serverChatBox, serverUserListBox);
+        Client client = new Client("localhost", "Client", clientChatBox, clientUserListBox);
+
+        server.start();
+        client.start();
+
+        //Wait for 300ms for handshake to happen
+        Thread.sleep(300);
+
+        server.stop();
+        client.stop();
+
+        assertEquals(0, clientUserListBox.getItems().size());
+        assertEquals(0, serverUserListBox.getItems().size());
     }
 
 }

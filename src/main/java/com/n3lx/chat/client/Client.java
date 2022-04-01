@@ -45,18 +45,16 @@ public class Client extends ChatMemberWithUIElements {
         try {
             //Inform the server about leaving
             sendMessage(new Message("disconnect:", userName, Message.MESSAGE_TYPE.ACTION));
-            serverStream.close();
-            clientThreads.shutdown();
 
-            while (!clientThreads.isTerminated()) {
-                Thread.sleep(10);
-            }
+            clientThreads.shutdown();
+            serverStream.close();
         } catch (SocketException ignored) {
             //This only happens when server has been closed and can be safely ignored
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "An error has occurred when attempting to disconnect from the server", e);
-        } catch (InterruptedException ignored) {
-
+        } finally {
+            //Empty connected users list box
+            userListBox.getItems().clear();
         }
     }
 
@@ -124,6 +122,7 @@ public class Client extends ChatMemberWithUIElements {
                 } catch (SocketException ignored) {
                     //This only happens when close() has been called
                     //and the messageHandler didn't have a chance to register it.
+                    return;
                 } catch (ClassNotFoundException | IOException e) {
                     LOGGER.log(Level.WARNING, "Could not parse incoming message", e);
                 }

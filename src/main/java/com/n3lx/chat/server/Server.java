@@ -63,18 +63,22 @@ public class Server extends ChatMemberWithUIElements {
 
             serverThreads.shutdown();
             serverSocket.close();
-
-            while (!serverThreads.isTerminated()) {
-                Thread.sleep(10);
-            }
-
-            for (SocketStream client : clientStreams.values()) {
-                client.close();
-            }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "An error has occurred during server closure", e.toString());
-        } catch (InterruptedException ignored) {
+        } finally {
+            //Close all connections
+            clientStreamsLock.lock();
+            for (SocketStream client : clientStreams.values()) {
+                try {
+                    client.close();
+                } catch (IOException ignored) {
 
+                }
+            }
+            clientStreamsLock.unlock();
+
+            //Empty connected users list box
+            userListBox.getItems().clear();
         }
     }
 
