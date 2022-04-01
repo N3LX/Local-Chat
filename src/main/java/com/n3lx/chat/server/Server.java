@@ -11,8 +11,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
@@ -28,7 +27,7 @@ public class Server extends ChatMemberWithUIElements {
 
     private final ReentrantLock clientStreamsLock;
     private ServerSocket serverSocket;
-    private List<SocketStream> clientStreams;
+    private HashMap<String, SocketStream> clientStreams;
     private ExecutorService serverThreads;
 
     public Server(String serverName, String welcomeMessage, ListView<String> chatBox, ListView<String> userListBox) {
@@ -42,7 +41,7 @@ public class Server extends ChatMemberWithUIElements {
         try {
             serverSocket = new ServerSocket(Settings.PORT);
             serverThreads = Executors.newCachedThreadPool();
-            clientStreams = new LinkedList<>();
+            clientStreams = new HashMap<>();
 
             startIncomingConnectionHandler();
             startMessageHandler();
@@ -65,7 +64,7 @@ public class Server extends ChatMemberWithUIElements {
                 Thread.sleep(10);
             }
 
-            for (SocketStream client : clientStreams) {
+            for (SocketStream client : clientStreams.values()) {
                 client.close();
             }
         } catch (IOException e) {
@@ -101,7 +100,7 @@ public class Server extends ChatMemberWithUIElements {
                         //Add client to the list and announce it to all clients
                         clientStreamsLock.lock();
 
-                        clientStreams.add(clientStream);
+                        clientStreams.put(clientResponse.getUsername(), clientStream);
 
                         Message newUserAnnouncement = new Message(clientResponse.getUsername() + " joined the chat.",
                                 this.serverName, Message.MESSAGE_TYPE.STANDARD);
@@ -128,9 +127,9 @@ public class Server extends ChatMemberWithUIElements {
     private void startMessageHandler() {
         Runnable messageHandler = () -> {
             while (!serverSocket.isClosed()) {
-                try {
-                    clientStreamsLock.lock();
-                    for (SocketStream client : clientStreams) {
+                clientStreamsLock.lock();
+                for (SocketStream client : clientStreams.values()) {
+                    try {
                         Message message = (Message) client.getObjectInputStream().readObject();
 
                         switch (message.getMessageType()) {
@@ -139,16 +138,16 @@ public class Server extends ChatMemberWithUIElements {
                                 appendMessageToChatBox(message);
                                 break;
                             case ACTION:
-                                //TODO Implement special message handling
+                                processActionMessage(message);
                                 break;
                         }
+                    } catch (SocketTimeoutException ignored) {
+                        //No activity on the socket, can proceed further
+                    } catch (ClassNotFoundException | IOException ignored) {
+
                     }
-                    clientStreamsLock.unlock();
-                } catch (SocketTimeoutException ignored) {
-                    //No activity on the socket, can proceed further
-                } catch (ClassNotFoundException | IOException e) {
-                    LOGGER.log(Level.WARNING, "Could not parse incoming message", e);
                 }
+                clientStreamsLock.unlock();
             }
         };
         serverThreads.submit(messageHandler);
@@ -157,7 +156,7 @@ public class Server extends ChatMemberWithUIElements {
     private void sendMessage(Message message) {
         clientStreamsLock.lock();
         try {
-            for (SocketStream recipient : clientStreams) {
+            for (SocketStream recipient : clientStreams.values()) {
                 recipient.getObjectOutputStream().writeObject(message);
             }
         } catch (IOException e) {
@@ -174,6 +173,31 @@ public class Server extends ChatMemberWithUIElements {
         }
         Message updateMessage = new Message(messageContents.toString(), serverName, Message.MESSAGE_TYPE.ACTION);
         sendMessage(updateMessage);
+    }
+
+    private void processActionMessage(Message message) {
+        String action = message.getMessage().split(":")[0];
+        switch (action) {
+            case "disconnect":
+                //Remove the client from the clientStreams list
+                clientStreams.remove(message.getUsername());
+
+                //Remove the client for userBoxList and inform other clients about the change
+                var newUserListBox = new ListView<String>();
+                newUserListBox.getItems().addAll(userListBox.getItems());
+                newUserListBox.getItems().remove(message.getUsername());
+                updateLocalUserListBox(newUserListBox);
+                updateClientsUserListBox(newUserListBox);
+
+                //Send a message to other clients about this event as well
+                var exitMessage = new Message(message.getUsername() + " has left the chat."
+                        , serverName, Message.MESSAGE_TYPE.STANDARD);
+                sendMessage(exitMessage);
+                appendMessageToChatBox(exitMessage);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown request was received from a client.");
+        }
     }
 
 }

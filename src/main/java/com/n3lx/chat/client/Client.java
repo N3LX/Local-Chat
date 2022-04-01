@@ -42,6 +42,8 @@ public class Client extends ChatMemberWithUIElements {
 
     public void stop() {
         try {
+            //Inform the server about leaving
+            sendMessage(new Message("disconnect:", userName, Message.MESSAGE_TYPE.ACTION));
             serverStream.close();
             clientThreads.shutdown();
 

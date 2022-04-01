@@ -52,8 +52,54 @@ public class ClientServerTest extends ApplicationTest {
         assertEquals(1, clientUserListBox.getItems().size());
         assertEquals("Client", clientUserListBox.getItems().get(0));
 
-        server.stop();
         client.stop();
+        server.stop();
+    }
+
+    @Test
+    public void testClientSideDisconnection() throws InterruptedException, TimeoutException {
+        var serverChatBox = new ListView<String>();
+        var serverUserListBox = new ListView<String>();
+        var clientChatBox = new ListView<String>();
+        var clientUserListBox = new ListView<String>();
+
+        Server server = new Server("Test server", "", serverChatBox, serverUserListBox);
+        Client client = new Client("localhost", "Client", clientChatBox, clientUserListBox);
+
+        server.start();
+        client.start();
+
+        //Wait up to 1s for handshake to happen
+        int attempts = 0;
+        while (clientChatBox.getItems().size() != 3 && attempts < 20) {
+            attempts++;
+            Thread.sleep(50);
+        }
+        if (attempts == 20) {
+            throw new TimeoutException("Initialization timeout");
+        }
+
+        client.stop();
+
+        //Wait up to 200ms for server to register that client has disconnected
+        attempts = 0;
+        while (clientChatBox.getItems().size() != 3 && attempts < 20) {
+            attempts++;
+            Thread.sleep(10);
+        }
+        if (attempts == 20) {
+            throw new TimeoutException("Initialization timeout");
+        }
+
+        assertEquals(3, serverChatBox.getItems().size());
+        assertEquals("Test server: Server has started, your IP is: " + ServerScanner.getLocalhostIP()
+                , serverChatBox.getItems().get(0));
+        assertEquals("Test server: Client joined the chat.", serverChatBox.getItems().get(1));
+        assertEquals("Test server: Client has left the chat.", serverChatBox.getItems().get(2));
+
+        assertEquals(0, serverUserListBox.getItems().size());
+
+        server.stop();
     }
 
 }
