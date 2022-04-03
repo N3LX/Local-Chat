@@ -31,7 +31,7 @@ public abstract class ChatMemberWithUIElements {
         });
     }
 
-    protected void appendMessageToChatBox(Message message) {
+    protected synchronized void appendMessageToChatBox(Message message) {
         Platform.runLater(() -> chatBox.getItems().add(message.getUsername() + ": " + message.getMessage()));
     }
 

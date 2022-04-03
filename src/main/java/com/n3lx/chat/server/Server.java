@@ -12,10 +12,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,23 +25,21 @@ public class Server extends ChatMemberWithUIElements {
     private final String serverName;
     private final String welcomeMessage;
 
-    private final ReentrantLock clientStreamsLock;
     private ServerSocket serverSocket;
-    private HashMap<String, SocketStream> clientStreams;
+    private ConcurrentHashMap<String, SocketStream> clientStreams;
     private ExecutorService serverThreads;
 
     public Server(String serverName, String welcomeMessage, ListView<String> chatBox, ListView<String> userListBox) {
         super(chatBox, userListBox);
         this.serverName = serverName;
         this.welcomeMessage = welcomeMessage;
-        clientStreamsLock = new ReentrantLock(true);
     }
 
     public void start() {
         try {
             serverSocket = new ServerSocket(Settings.PORT);
             serverThreads = Executors.newCachedThreadPool();
-            clientStreams = new HashMap<>();
+            clientStreams = new ConcurrentHashMap<>();
 
             startIncomingConnectionHandler();
             startMessageHandler();
@@ -59,7 +56,7 @@ public class Server extends ChatMemberWithUIElements {
     public void stop() {
         try {
             //Inform the connected clients about shutdown
-            sendMessage(new Message("Server will shut down shortly", serverName, Message.MESSAGE_TYPE.STANDARD));
+            sendMessage(new Message("Server is shutting down...", serverName, Message.MESSAGE_TYPE.STANDARD));
             appendMessageToChatBox(new Message("Server is shutting down...", serverName, Message.MESSAGE_TYPE.STANDARD));
             sendMessage(new Message("shutdown:", serverName, Message.MESSAGE_TYPE.ACTION));
 
@@ -69,15 +66,14 @@ public class Server extends ChatMemberWithUIElements {
             LOGGER.log(Level.SEVERE, "An error has occurred during server closure", e.toString());
         } finally {
             //Close all connections
-            clientStreamsLock.lock();
             for (SocketStream client : clientStreams.values()) {
                 try {
                     client.close();
-                } catch (IOException ignored) {
-
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "A problem has occurred while disconnecting " +
+                            "clients during shutdown sequence", e);
                 }
             }
-            clientStreamsLock.unlock();
 
             //Empty connected users list box
             Platform.runLater(() -> userListBox.getItems().clear());
@@ -107,14 +103,11 @@ public class Server extends ChatMemberWithUIElements {
 
                     //Check if the response matches what is expected of a Client instance
                     if (clientResponse.getMessage().equals("Handshake success")) {
-                        //Add client to the list and announce it to all clients
-                        clientStreamsLock.lock();
-
                         clientStreams.put(clientResponse.getUsername(), clientStream);
 
                         Message newUserAnnouncement = new Message(clientResponse.getUsername() + " joined the chat.",
                                 this.serverName, Message.MESSAGE_TYPE.STANDARD);
-                        clientStream.getObjectOutputStream().writeObject(newUserAnnouncement);
+                        sendMessage(newUserAnnouncement);
                         appendMessageToChatBox(newUserAnnouncement);
 
                         //Update the user list box
@@ -123,8 +116,6 @@ public class Server extends ChatMemberWithUIElements {
                         newUserListBox.getItems().add(clientResponse.getUsername());
                         updateLocalUserListBox(newUserListBox);
                         updateClientsUserListBox(newUserListBox);
-
-                        clientStreamsLock.unlock();
                     }
                 } catch (IOException | ClassNotFoundException ignored) {
 
@@ -137,7 +128,6 @@ public class Server extends ChatMemberWithUIElements {
     private void startMessageHandler() {
         Runnable messageHandler = () -> {
             while (!serverSocket.isClosed()) {
-                clientStreamsLock.lock();
                 for (SocketStream client : clientStreams.values()) {
                     try {
                         Message message = (Message) client.getObjectInputStream().readObject();
@@ -157,14 +147,12 @@ public class Server extends ChatMemberWithUIElements {
 
                     }
                 }
-                clientStreamsLock.unlock();
             }
         };
         serverThreads.submit(messageHandler);
     }
 
-    private void sendMessage(Message message) {
-        clientStreamsLock.lock();
+    private synchronized void sendMessage(Message message) {
         try {
             for (SocketStream recipient : clientStreams.values()) {
                 recipient.getObjectOutputStream().writeObject(message);
@@ -172,7 +160,6 @@ public class Server extends ChatMemberWithUIElements {
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "An error has occurred when sending a message", e);
         }
-        clientStreamsLock.unlock();
     }
 
     private synchronized void updateClientsUserListBox(ListView<String> newUserListBox) {
@@ -189,8 +176,13 @@ public class Server extends ChatMemberWithUIElements {
         String action = message.getMessage().split(":")[0];
         switch (action) {
             case "disconnect":
-                //Remove the client from the clientStreams list
-                clientStreams.remove(message.getUsername());
+                //Close connection to the client and remove it from the clientStreams list
+                try {
+                    clientStreams.get(message.getUsername()).close();
+                    clientStreams.remove(message.getUsername());
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "A problem has occurred during disconnection from the client", e);
+                }
 
                 //Remove the client for userBoxList and inform other clients about the change
                 var newUserListBox = new ListView<String>();
