@@ -77,12 +77,17 @@ public class HostWindow extends DialogWindow {
 
         Button connectButton = new Button("Host");
         connectButton.setOnAction(actionEvent -> {
-            Server server = new Server(serverNameTextField.getText()
-                    , serverMessageTextArea.getText()
-                    , ChatController.getInstance().getChatBox()
-                    , ChatController.getInstance().getUserListBox());
-            ChatController.getInstance().startChat(server);
-            windowStage.close();
+            String serverName = serverNameTextField.getText();
+            String serverMessage = serverMessageTextArea.getText();
+            if (validateInput(serverName, serverMessage)) {
+                Server server = new Server(serverName, serverMessage
+                        , ChatController.getInstance().getChatBox()
+                        , ChatController.getInstance().getUserListBox());
+                ChatController.getInstance().startChat(server);
+                windowStage.close();
+            } else {
+                showAlert();
+            }
         });
 
         Button cancelButton = new Button("Cancel");
@@ -90,6 +95,28 @@ public class HostWindow extends DialogWindow {
 
         buttonRow.getChildren().addAll(connectButton, cancelButton);
         parentPane.addColumn(0, buttonRow);
+    }
+
+    private boolean validateInput(String serverName, String serverMessage) {
+        //All fields must be filled
+        if (serverName.equals("") || serverMessage.equals("")) {
+            return false;
+        }
+
+        //Input with only white space is not valid either
+        if (serverName.chars().distinct().count() == 1 && serverName.contains(" ")) {
+            return false;
+        }
+        if (serverMessage.chars().distinct().count() == 1 && serverMessage.contains(" ")) {
+            return false;
+        }
+        return true;
+    }
+
+    private void showAlert() {
+        String alertMessage = "All fields cannot be empty!";
+        AlertWindow alertWindow = new AlertWindow(windowStage, alertMessage);
+        alertWindow.getWindow().show();
     }
 
 }

@@ -101,12 +101,17 @@ public class ConnectionWindow extends DialogWindow {
 
         Button connectButton = new Button("Connect");
         connectButton.setOnAction(actionEvent -> {
-            Client client = new Client(serverSelectionList.getSelectionModel().getSelectedItem()
-                    , usernameTextField.getText()
-                    , ChatController.getInstance().getChatBox()
-                    , ChatController.getInstance().getUserListBox());
-            ChatController.getInstance().startChat(client);
-            windowStage.close();
+            String server = serverSelectionList.getSelectionModel().getSelectedItem();
+            String username = usernameTextField.getText();
+            if (validateInput(server, username)) {
+                Client client = new Client(server, username
+                        , ChatController.getInstance().getChatBox()
+                        , ChatController.getInstance().getUserListBox());
+                ChatController.getInstance().startChat(client);
+                windowStage.close();
+            } else {
+                showAlert();
+            }
         });
 
         Button cancelButton = new Button("Cancel");
@@ -114,6 +119,32 @@ public class ConnectionWindow extends DialogWindow {
 
         buttonRow.getChildren().addAll(connectButton, cancelButton);
         parentPane.addColumn(0, buttonRow);
+    }
+
+
+    private boolean validateInput(String server, String username) {
+        //All fields must be filled/selected
+        if (username.equals("")) {
+            return false;
+        }
+        if (server == null) {
+            return false;
+        }
+
+        //Username with only white space is not valid either
+        if (username.chars().distinct().count() == 1 && username.contains(" ")) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void showAlert() {
+        String alertMessage = "Incorrect input!\n\n" +
+                "Username cannot be empty or contain \":\" character.\n" +
+                "Ensure that you selected a server from the list.";
+        AlertWindow alertWindow = new AlertWindow(windowStage, alertMessage);
+        alertWindow.getWindow().show();
     }
 
 }
