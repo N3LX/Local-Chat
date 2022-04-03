@@ -1,45 +1,57 @@
-*{
+* {
     -fx-font-family: Verdana;
 }
-.menu{
+
+.menu {
     -fx-font-size: 12;
 }
 
-.context-menu{
+.context-menu {
     -fx-background-radius: 10;
 }
 
-.menu-bar{
+.menu-bar {
     -fx-background-radius: 10;
 }
 
-.menu-item{
+.menu-item {
     -fx-background-radius: 10;
 }
 
-.menu{
+.menu {
     -fx-background-radius: 10;
 }
 
-.button{
+.button {
     -fx-background-radius: 10;
     -fx-background-insets: 0;
 }
 
-.button:pressed{
+.button:pressed {
     -fx-opacity: 0.7;
 }
 
-.list-view{
+.list-view {
     -fx-background-radius: 10;
     -fx-padding: 0;
     -fx-background-insets: 0;
 }
 
-.text-field{
+.list-view .list-cell,
+.list-view .list-cell:filled,
+.list-view .list-cell:focused,
+ .list-view .list-cell:hover {
+    -fx-background-color: transparent;
+}
+
+.list-view .list-cell:selected{
+    -fx-underline: true;
+}
+
+.text-field {
     -fx-background-radius: 10;
 }
 
-.text-area .content{
+.text-area .content {
     -fx-background-radius: 10;
 }
