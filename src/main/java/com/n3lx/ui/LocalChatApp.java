@@ -1,6 +1,7 @@
 package com.n3lx.ui;
 
 
+import com.n3lx.ui.dialogwindows.AlertWindow;
 import com.n3lx.ui.dialogwindows.ConnectionWindow;
 import com.n3lx.ui.dialogwindows.HostWindow;
 import com.n3lx.ui.util.Preferences;
@@ -11,8 +12,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.stream.DoubleStream;
 
 public class LocalChatApp extends Application {
@@ -83,6 +88,33 @@ public class LocalChatApp extends Application {
         toolsMenuItem1.setOnAction(actionEvent -> ChatController.getInstance().getChatBox().getItems().clear());
 
         MenuItem toolsMenuItem2 = new MenuItem("Save chat log to file...");
+        toolsMenuItem2.setOnAction(actionEvent -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters()
+                    .add(new FileChooser.ExtensionFilter("Text files (*.txt)", "*.txt"));
+            File targetFile = fileChooser.showSaveDialog(mainStage);
+
+            boolean wasOperationSuccessful;
+            try {
+                FileWriter fileWriter = new FileWriter(targetFile);
+                for (String line : ChatController.getInstance().getChatBox().getItems()) {
+                    fileWriter.append(line).append("\n");
+                }
+                fileWriter.close();
+                wasOperationSuccessful = true;
+            } catch (IOException e) {
+                wasOperationSuccessful = false;
+            }
+
+            String alertMessage;
+            if (wasOperationSuccessful) {
+                alertMessage = "File has been saved to chosen location";
+            } else {
+                alertMessage = "An error has occurred while trying to save a file to this location";
+            }
+            AlertWindow alert = new AlertWindow(mainStage, alertMessage);
+            alert.getWindow().show();
+        });
 
         toolsMenu.getItems().addAll(toolsMenuItem1, toolsMenuItem2);
 

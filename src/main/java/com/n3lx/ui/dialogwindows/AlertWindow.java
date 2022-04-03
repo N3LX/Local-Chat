@@ -17,7 +17,7 @@ public class AlertWindow extends DialogWindow {
 
     private String alertMessage;
 
-    AlertWindow(Stage parentStage, String alertMessage) {
+    public AlertWindow(Stage parentStage, String alertMessage) {
         super(parentStage);
         this.alertMessage = alertMessage;
         createUI();
