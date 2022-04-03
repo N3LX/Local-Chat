@@ -11,13 +11,13 @@ A chat application for chatting over a local network.
 
 ## How to use
 
-###Joining an existing server
+### Joining an existing server
 Go to **Chat** -> **Connect**, select a server and type your username. Then click **Connect**.
 
 *Note: The list of available servers refreshes every couple of seconds. If you don't see a server there, but you are 
 sure there is one running make sure that all [requirements](#requirements) are met.*
 
-###Hosting a server
+### Hosting a server
 
 Go to **Chat** -> **Host**, select the server name and server message (a message that will be displayed to every
 user that connects to your chat), then click **Host**.
