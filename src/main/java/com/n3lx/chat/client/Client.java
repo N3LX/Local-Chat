@@ -8,6 +8,7 @@ import com.n3lx.chat.util.SocketStream;
 import javafx.application.Platform;
 import javafx.scene.control.ListView;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
@@ -120,7 +121,7 @@ public class Client extends ChatMemberWithUIElements {
                     }
                 } catch (SocketTimeoutException ignored) {
                     //No activity on the socket, can proceed further
-                } catch (SocketException ignored) {
+                } catch (SocketException | EOFException ignored) {
                     //This only happens when close() has been called
                     //and the messageHandler didn't have a chance to register it.
                     return;

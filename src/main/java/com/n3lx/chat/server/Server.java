@@ -70,7 +70,7 @@ public class Server extends ChatMemberWithUIElements {
                 try {
                     client.close();
                 } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "A problem has occurred while disconnecting " +
+                    LOGGER.log(Level.FINE, "A problem has occurred while disconnecting " +
                             "clients during shutdown sequence", e);
                 }
             }
@@ -110,12 +110,12 @@ public class Server extends ChatMemberWithUIElements {
                         sendMessage(newUserAnnouncement);
                         appendMessageToChatBox(newUserAnnouncement);
 
-                        //Update the user list box
                         var newUserListBox = new ListView<String>();
-                        newUserListBox.getItems().addAll(userListBox.getItems());
-                        newUserListBox.getItems().add(clientResponse.getUsername());
+                        newUserListBox.getItems().addAll(clientStreams.keySet().stream().sorted().toList());
                         updateLocalUserListBox(newUserListBox);
                         updateClientsUserListBox(newUserListBox);
+                    } else {
+                        clientSocket.close();
                     }
                 } catch (IOException | ClassNotFoundException ignored) {
 
@@ -158,7 +158,7 @@ public class Server extends ChatMemberWithUIElements {
                 recipient.getObjectOutputStream().writeObject(message);
             }
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "An error has occurred when sending a message", e);
+            LOGGER.log(Level.FINE, "An error has occurred when sending a message", e);
         }
     }
 
@@ -179,10 +179,10 @@ public class Server extends ChatMemberWithUIElements {
                 //Close connection to the client and remove it from the clientStreams list
                 try {
                     clientStreams.get(message.getUsername()).close();
-                    clientStreams.remove(message.getUsername());
                 } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "A problem has occurred during disconnection from the client", e);
+                    LOGGER.log(Level.FINE, "A problem has occurred during disconnection from the client", e);
                 }
+                clientStreams.remove(message.getUsername());
 
                 //Remove the client for userBoxList and inform other clients about the change
                 var newUserListBox = new ListView<String>();
