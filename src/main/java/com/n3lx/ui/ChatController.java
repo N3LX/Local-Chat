@@ -78,6 +78,7 @@ public class ChatController {
                 client.sendMessage(messageTextField.getText());
                 messageTextField.clear();
             });
+            messageTextField.setOnAction(sendButton.getOnAction());
             messageTextField.setDisable(false);
         }
 
