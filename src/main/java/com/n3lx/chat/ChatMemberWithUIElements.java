@@ -1,7 +1,12 @@
 package com.n3lx.chat;
 
+import com.n3lx.ui.util.Preferences;
 import javafx.application.Platform;
 import javafx.scene.control.ListView;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.time.LocalDateTime;
 
 public abstract class ChatMemberWithUIElements {
 
@@ -32,7 +37,20 @@ public abstract class ChatMemberWithUIElements {
     }
 
     protected synchronized void appendMessageToChatBox(Message message) {
-        Platform.runLater(() -> chatBox.getItems().add(message.getUsername() + ": " + message.getMessage()));
+        StringBuilder parsedMessage = new StringBuilder();
+        NumberFormat formatter = new DecimalFormat("00");
+        if (Preferences.getAllowTimestamps()) {
+            LocalDateTime timestamp = message.getTimestamp();
+            parsedMessage.append("[");
+            parsedMessage.append(formatter.format(timestamp.getHour())).append(":")
+                    .append(formatter.format(timestamp.getMinute())).append(":")
+                    .append(formatter.format(timestamp.getSecond()));
+            parsedMessage.append("] ");
+        }
+        parsedMessage.append(message.getUsername()).append(": ").append(message.getMessage());
+        Platform.runLater(() -> {
+            chatBox.getItems().add(parsedMessage.toString());
+        });
     }
 
 }

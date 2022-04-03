@@ -149,7 +149,11 @@ public class LocalChatApp extends Application {
 
         appearanceMenu.getItems().addAll(appearanceMenuItem1, appearanceMenuItem2);
 
-        MenuItem settingsMenuItem1 = new MenuItem("Show timestamps");
+        CheckMenuItem settingsMenuItem1 = new CheckMenuItem("Show timestamps");
+        settingsMenuItem1.setOnAction(actionEvent -> {
+            Preferences.setAllowTimestamps(settingsMenuItem1.isSelected());
+        });
+
         settingsMenu.getItems().addAll(appearanceMenu, settingsMenuItem1);
 
         menuBar.getMenus().addAll(chatMenu, toolsMenu, settingsMenu);
