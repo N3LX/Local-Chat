@@ -15,7 +15,7 @@ public class AlertWindow extends DialogWindow {
     private static final double VERTICAL_SPACING = 15;
     private static final double WINDOW_PADDING = 15;
 
-    private String alertMessage;
+    private final String alertMessage;
 
     public AlertWindow(Stage parentStage, String alertMessage) {
         super(parentStage);

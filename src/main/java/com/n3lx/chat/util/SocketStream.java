@@ -10,10 +10,10 @@ import java.net.Socket;
  */
 public class SocketStream {
 
-    private Socket socket;
+    private final Socket socket;
 
-    private ObjectInputStream objectInputStream;
-    private ObjectOutputStream objectOutputStream;
+    private final ObjectInputStream objectInputStream;
+    private final ObjectOutputStream objectOutputStream;
 
     public SocketStream(Socket socket) throws IOException {
         this.socket = socket;

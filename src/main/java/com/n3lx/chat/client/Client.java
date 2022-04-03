@@ -112,12 +112,8 @@ public class Client extends ChatMemberWithUIElements {
                     Message message = (Message) serverStream.getObjectInputStream().readObject();
 
                     switch (message.getMessageType()) {
-                        case STANDARD:
-                            appendMessageToChatBox(message);
-                            break;
-                        case ACTION:
-                            processActionMessage(message);
-                            break;
+                        case STANDARD -> appendMessageToChatBox(message);
+                        case ACTION -> processActionMessage(message);
                     }
                 } catch (SocketTimeoutException ignored) {
                     //No activity on the socket, can proceed further

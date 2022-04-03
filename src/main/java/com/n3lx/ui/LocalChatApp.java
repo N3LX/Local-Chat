@@ -42,9 +42,7 @@ public class LocalChatApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         mainStage = stage;
-        mainStage.setOnCloseRequest(windowEvent -> {
-            ChatController.getInstance().stop();
-        });
+        mainStage.setOnCloseRequest(windowEvent -> ChatController.getInstance().stop());
 
         VBox root = new VBox();
         root.getChildren().add(createMenuBar());
@@ -153,9 +151,7 @@ public class LocalChatApp extends Application {
         appearanceMenu.getItems().addAll(appearanceMenuItem1, appearanceMenuItem2);
 
         CheckMenuItem settingsMenuItem1 = new CheckMenuItem("Show timestamps");
-        settingsMenuItem1.setOnAction(actionEvent -> {
-            Preferences.setAllowTimestamps(settingsMenuItem1.isSelected());
-        });
+        settingsMenuItem1.setOnAction(actionEvent -> Preferences.setAllowTimestamps(settingsMenuItem1.isSelected()));
 
         settingsMenu.getItems().addAll(appearanceMenu, settingsMenuItem1);
 

@@ -48,9 +48,7 @@ public abstract class ChatMemberWithUIElements {
             parsedMessage.append("] ");
         }
         parsedMessage.append(message.getUsername()).append(": ").append(message.getMessage());
-        Platform.runLater(() -> {
-            chatBox.getItems().add(parsedMessage.toString());
-        });
+        Platform.runLater(() -> chatBox.getItems().add(parsedMessage.toString()));
     }
 
 }

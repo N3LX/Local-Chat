@@ -59,18 +59,14 @@ public class ChatController {
             disconnectButton.setDisable(true);
             hostButton.setDisable(true);
             stopHostingButton.setDisable(false);
-            stopHostingButton.setOnAction(actionEvent -> {
-                stop();
-            });
+            stopHostingButton.setOnAction(actionEvent -> stop());
             sendButton.setDisable(true);
             messageTextField.setDisable(true);
         } else {
             Client client = (Client) chatClass;
             connectButton.setDisable(true);
             disconnectButton.setDisable(false);
-            disconnectButton.setOnAction(actionEvent -> {
-                stop();
-            });
+            disconnectButton.setOnAction(actionEvent -> stop());
             hostButton.setDisable(true);
             stopHostingButton.setDisable(true);
             sendButton.setDisable(false);
