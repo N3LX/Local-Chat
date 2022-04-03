@@ -2,7 +2,7 @@
 
 A chat application for chatting over a local network.
 
-[Image 1](media/1.png)
+![Image 1](media/1.png)
 
 ## Features
 
@@ -16,7 +16,7 @@ A chat application for chatting over a local network.
 ### Joining an existing server
 Go to **Chat** -> **Connect**, select a server and type your username. Then click **Connect**.
 
-[Image 2](media/2.png)
+![Image 2](media/2.png)
 
 *Note: The list of available servers refreshes every couple of seconds. If you don't see a server there, but you are 
 sure there is one running make sure that all [requirements](#requirements) are met.*
@@ -26,7 +26,7 @@ sure there is one running make sure that all [requirements](#requirements) are m
 Go to **Chat** -> **Host**, select the server name and server message (a message that will be displayed to every
 user that connects to your chat), then click **Host**.
 
-[Image 3](media/3.png)
+![Image 3](media/3.png)
 
 *Note: If you would like to attend the chat as well, it is perfectly safe to open another instance of this application on the
 same computer. With IDE/Terminal it is rather easy, but you would like to stick to graphical interface then just make a 
