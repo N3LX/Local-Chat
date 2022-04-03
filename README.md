@@ -28,15 +28,16 @@ user that connects to your chat), then click **Host**.
 
 ![Image 3](media/3.png)
 
-*Note: If you would like to attend the chat as well, it is perfectly safe to open another instance of this application on the
-same computer. With IDE/Terminal it is rather easy, but you would like to stick to graphical interface then just make a 
-copy of the .jar file with a slightly different name, and you should be able to open it twice.*
+*Note: If you would like to attend the chat as well, it is perfectly safe to open another instance of this application 
+on the same computer. With IDE/Terminal it is rather easy, but you would like to stick to graphical interface then 
+just make a copy of the .jar file with a slightly different name, and you should be able to open it twice.*
 
 ## How to run/install
 
 ### Standalone .jar file
 
-***TODO Once project is published on GitHub***
+Download the JAR file from [Releases page](https://github.com/N3LX/Local-Chat/releases) and double click on it to 
+run the application.
 
 ### Compile from source
 
