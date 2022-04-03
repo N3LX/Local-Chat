@@ -1,6 +1,10 @@
 package com.n3lx.ui.dialogwindows;
 
+import com.n3lx.chat.client.Client;
+import com.n3lx.chat.util.serverscanner.ServerScanner;
+import com.n3lx.ui.ChatController;
 import com.n3lx.ui.util.Preferences;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,11 +16,18 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class ConnectionWindow extends DialogWindow {
 
     private static final double VERTICAL_SPACING = 15;
     private static final double HORIZONTAL_SPACING = 10;
     private static final double WINDOW_PADDING = 15;
+
+    private TextField usernameTextField;
+    private ListView<String> serverSelectionList;
 
     public ConnectionWindow(Stage parentStage) {
         super(parentStage);
@@ -49,7 +60,27 @@ public class ConnectionWindow extends DialogWindow {
 
     private void createServerSelectionRow(GridPane parentPane) {
         Label serverSelectionLabel = new Label("Select server");
-        ListView<String> serverSelectionList = new ListView<>();
+        serverSelectionList = new ListView<>();
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            try {
+                while (!windowStage.isShowing()) {
+                    Thread.sleep(50);
+                }
+                while (windowStage.isShowing()) {
+                    List<String> onlineServers = ServerScanner.getListOfOnlineServers();
+                    Platform.runLater(() -> {
+                        serverSelectionList.getItems().clear();
+                        serverSelectionList.getItems().addAll(onlineServers);
+                    });
+                    Thread.sleep(5000);
+                }
+            } catch (InterruptedException ignored) {
+
+            }
+        });
+        executor.shutdown();
 
         parentPane.addColumn(0, serverSelectionLabel);
         parentPane.addColumn(1, serverSelectionList);
@@ -57,7 +88,7 @@ public class ConnectionWindow extends DialogWindow {
 
     private void createUsernameSetupRow(GridPane parentPane) {
         Label usernameLabel = new Label("Your username");
-        TextField usernameTextField = new TextField();
+        usernameTextField = new TextField();
 
         parentPane.addColumn(0, usernameLabel);
         parentPane.addColumn(1, usernameTextField);
@@ -69,6 +100,14 @@ public class ConnectionWindow extends DialogWindow {
         buttonRow.setSpacing(HORIZONTAL_SPACING);
 
         Button connectButton = new Button("Connect");
+        connectButton.setOnAction(actionEvent -> {
+            Client client = new Client(serverSelectionList.getSelectionModel().getSelectedItem()
+                    , usernameTextField.getText()
+                    , ChatController.getInstance().getChatBox()
+                    , ChatController.getInstance().getUserListBox());
+            ChatController.getInstance().startChat(client);
+            windowStage.close();
+        });
 
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(actionEvent -> windowStage.close());

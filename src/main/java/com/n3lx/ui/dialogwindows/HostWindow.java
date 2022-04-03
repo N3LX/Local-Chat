@@ -1,5 +1,7 @@
 package com.n3lx.ui.dialogwindows;
 
+import com.n3lx.chat.server.Server;
+import com.n3lx.ui.ChatController;
 import com.n3lx.ui.util.Preferences;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -18,6 +20,9 @@ public class HostWindow extends DialogWindow {
     private static final double HORIZONTAL_SPACING = 10;
     private static final double WINDOW_PADDING = 15;
 
+    private TextField serverNameTextField;
+    private TextArea serverMessageTextArea;
+
     public HostWindow(Stage parentStage) {
         super(parentStage);
         createUI();
@@ -33,7 +38,6 @@ public class HostWindow extends DialogWindow {
         selectionPane.setVgap(VERTICAL_SPACING);
         selectionPane.setHgap(HORIZONTAL_SPACING);
         createServerNameRow(selectionPane);
-        createUsernameSetupRow(selectionPane);
         createServerMessageRow(selectionPane);
         windowContent.addColumn(0, selectionPane);
 
@@ -50,24 +54,16 @@ public class HostWindow extends DialogWindow {
 
     private void createServerNameRow(GridPane parentPane) {
         Label serverNameLabel = new Label("Server name");
-        TextField serverNameTextField = new TextField();
+        serverNameTextField = new TextField();
 
         parentPane.addColumn(0, serverNameLabel);
         parentPane.addColumn(1, serverNameTextField);
     }
 
-    private void createUsernameSetupRow(GridPane parentPane) {
-        Label usernameLabel = new Label("Your username");
-        TextField usernameTextField = new TextField();
-
-        parentPane.addColumn(0, usernameLabel);
-        parentPane.addColumn(1, usernameTextField);
-    }
-
     private void createServerMessageRow(GridPane parentPane) {
         Label serverMessageLabel = new Label("Server welcome message");
 
-        TextArea serverMessageTextArea = new TextArea();
+        serverMessageTextArea = new TextArea();
         serverMessageTextArea.setPrefRowCount(10);
 
         parentPane.addColumn(0, serverMessageLabel);
@@ -80,6 +76,14 @@ public class HostWindow extends DialogWindow {
         buttonRow.setSpacing(HORIZONTAL_SPACING);
 
         Button connectButton = new Button("Host");
+        connectButton.setOnAction(actionEvent -> {
+            Server server = new Server(serverNameTextField.getText()
+                    , serverMessageTextArea.getText()
+                    , ChatController.getInstance().getChatBox()
+                    , ChatController.getInstance().getUserListBox());
+            ChatController.getInstance().startChat(server);
+            windowStage.close();
+        });
 
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(actionEvent -> windowStage.close());
