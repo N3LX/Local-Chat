@@ -42,6 +42,9 @@ public class LocalChatApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         mainStage = stage;
+        mainStage.setOnCloseRequest(windowEvent -> {
+            ChatController.getInstance().stop();
+        });
 
         VBox root = new VBox();
         root.getChildren().add(createMenuBar());
