@@ -78,8 +78,12 @@ public class LocalChatApp extends Application {
         ChatController.getInstance().linkChatMenuBarButtons(chatMenuItem1, chatMenuItem2, chatMenuItem3, chatMenuItem4);
 
         Menu toolsMenu = new Menu("Tools");
+
         MenuItem toolsMenuItem1 = new MenuItem("Clear chat");
+        toolsMenuItem1.setOnAction(actionEvent -> ChatController.getInstance().getChatBox().getItems().clear());
+
         MenuItem toolsMenuItem2 = new MenuItem("Save chat log to file...");
+
         toolsMenu.getItems().addAll(toolsMenuItem1, toolsMenuItem2);
 
         Menu settingsMenu = new Menu("Settings");
