@@ -5,6 +5,7 @@ import com.n3lx.chat.Message;
 import com.n3lx.chat.server.Server;
 import com.n3lx.chat.util.Settings;
 import com.n3lx.chat.util.SocketStream;
+import com.n3lx.ui.ChatController;
 import javafx.application.Platform;
 import javafx.scene.control.ListView;
 
@@ -141,7 +142,7 @@ public class Client extends ChatMemberWithUIElements {
                 updateLocalUserListBox(newUserListBox);
                 break;
             case "shutdown":
-                stop();
+                ChatController.getInstance().stop();
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown request was received from server.");
