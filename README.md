@@ -47,7 +47,7 @@ Clone the repository and open the location of your local copy in your terminal, 
 
 `mvn clean package -DskipTests`
 
-`java -jar target/local-chat-1.0-SNAPSHOT.jar`
+`java -jar target/local-chat-1.1-SNAPSHOT.jar`
 
 ## Requirements
 
