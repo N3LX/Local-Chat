@@ -119,8 +119,12 @@ public class Client extends ChatMemberWithUIElements {
                 } catch (SocketTimeoutException ignored) {
                     //No activity on the socket, can proceed further
                 } catch (SocketException | EOFException ignored) {
-                    //This only happens when close() has been called
-                    //and the messageHandler didn't have a chance to register it.
+                    ChatController.getInstance().stop();
+                    var serverInterruptMessage = new Message(
+                            "Connection to server has been lost, application will now disconnect.",
+                            "System",
+                            Message.MESSAGE_TYPE.STANDARD);
+                    appendMessageToChatBox(serverInterruptMessage);
                     return;
                 } catch (ClassNotFoundException | IOException e) {
                     LOGGER.log(Level.WARNING, "Could not parse incoming message", e);
