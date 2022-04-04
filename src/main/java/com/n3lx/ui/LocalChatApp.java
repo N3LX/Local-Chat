@@ -95,6 +95,11 @@ public class LocalChatApp extends Application {
                     .add(new FileChooser.ExtensionFilter("Text files (*.txt)", "*.txt"));
             File targetFile = fileChooser.showSaveDialog(mainStage);
 
+            //Check if user has chosen the file location
+            if (targetFile == null) {
+                return;
+            }
+
             boolean wasOperationSuccessful;
             try {
                 FileWriter fileWriter = new FileWriter(targetFile);
