@@ -1,5 +1,6 @@
 package com.n3lx.chat;
 
+import com.n3lx.chat.util.Message;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -1,8 +1,8 @@
 package com.n3lx.chat.client;
 
-import com.n3lx.chat.ChatMemberWithUIElements;
-import com.n3lx.chat.Message;
+import com.n3lx.chat.ChatMember;
 import com.n3lx.chat.server.Server;
+import com.n3lx.chat.util.Message;
 import com.n3lx.chat.util.Settings;
 import com.n3lx.chat.util.SocketStream;
 import com.n3lx.ui.ChatController;
@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Client extends ChatMemberWithUIElements {
+public class Client extends ChatMember {
 
     private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
 
@@ -61,6 +61,11 @@ public class Client extends ChatMemberWithUIElements {
         }
     }
 
+    /**
+     * Send a string representing a message.
+     *
+     * @param message
+     */
     public void sendMessage(String message) {
         try {
             Message msg = new Message(message, userName, Message.MESSAGE_TYPE.STANDARD);
@@ -70,6 +75,11 @@ public class Client extends ChatMemberWithUIElements {
         }
     }
 
+    /**
+     * Send a message object. This is mainly used for internal calls to communicate with server
+     *
+     * @param message
+     */
     private void sendMessage(Message message) {
         try {
             serverStream.getObjectOutputStream().writeObject(message);
@@ -82,7 +92,7 @@ public class Client extends ChatMemberWithUIElements {
 
     private void connect() {
         try {
-            socket = new Socket(ipAddress, Settings.PORT);
+            socket = new Socket(ipAddress, Settings.getPort());
             serverStream = new SocketStream(socket);
         } catch (SocketException ignored) {
             //This only happens when server has been closed and can be safely ignored
@@ -119,12 +129,14 @@ public class Client extends ChatMemberWithUIElements {
                 } catch (SocketTimeoutException ignored) {
                     //No activity on the socket, can proceed further
                 } catch (SocketException | EOFException ignored) {
-                    ChatController.getInstance().stop();
+                    //This will most likely mean that there was some kind of interruption on the socket and
+                    //that it is no longer usable. As such we should disconnect the client.
                     var serverInterruptMessage = new Message(
                             "Connection to server has been lost, application will now disconnect.",
                             "System",
                             Message.MESSAGE_TYPE.STANDARD);
                     appendMessageToChatBox(serverInterruptMessage);
+                    ChatController.getInstance().stop();
                     return;
                 } catch (ClassNotFoundException | IOException e) {
                     LOGGER.log(Level.WARNING, "Could not parse incoming message", e);

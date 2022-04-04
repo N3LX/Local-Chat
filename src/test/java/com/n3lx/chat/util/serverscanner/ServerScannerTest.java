@@ -25,7 +25,7 @@ public class ServerScannerTest extends ApplicationTest {
     public void testScanningIfServerIsFoundButNotAnInstanceOfServerClass() {
         Executors.newCachedThreadPool().submit(() -> {
             try {
-                var dummyServer = new ServerSocket(Settings.PORT);
+                var dummyServer = new ServerSocket(Settings.getPort());
                 var connection = dummyServer.accept();
                 var dummyOutputStream = new ObjectOutputStream(connection.getOutputStream());
                 var dummyInputStream = new ObjectInputStream(connection.getInputStream());

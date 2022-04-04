@@ -1,7 +1,7 @@
 package com.n3lx.chat.server;
 
-import com.n3lx.chat.ChatMemberWithUIElements;
-import com.n3lx.chat.Message;
+import com.n3lx.chat.ChatMember;
+import com.n3lx.chat.util.Message;
 import com.n3lx.chat.util.Settings;
 import com.n3lx.chat.util.SocketStream;
 import com.n3lx.chat.util.serverscanner.ServerScanner;
@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Server extends ChatMemberWithUIElements {
+public class Server extends ChatMember {
 
     private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
 
@@ -37,7 +37,7 @@ public class Server extends ChatMemberWithUIElements {
 
     public void start() {
         try {
-            serverSocket = new ServerSocket(Settings.PORT);
+            serverSocket = new ServerSocket(Settings.getPort());
             serverThreads = Executors.newCachedThreadPool();
             clientStreams = new ConcurrentHashMap<>();
 
@@ -132,6 +132,7 @@ public class Server extends ChatMemberWithUIElements {
                     try {
                         Message message = (Message) clientStreams.get(clientName).getObjectInputStream().readObject();
 
+                        //If message has been received, check if it was meant for end users or for a server.
                         switch (message.getMessageType()) {
                             case STANDARD -> {
                                 sendMessage(message);
@@ -142,6 +143,8 @@ public class Server extends ChatMemberWithUIElements {
                     } catch (SocketTimeoutException ignored) {
                         //No activity on the socket, can proceed further
                     } catch (ClassNotFoundException | IOException e) {
+                        //This will most likely mean that there was some kind of interruption on the socket and
+                        //that it is no longer usable. As such we should disconnect the client.
                         disconnectClient(clientName);
 
                         //Send a message to other clients about this event as well
@@ -166,13 +169,21 @@ public class Server extends ChatMemberWithUIElements {
         }
     }
 
+    /**
+     * Based on the provided list create a Message object that will be later interpreted by all clients as an
+     * instruction to update their respective user lists.
+     *
+     * @param newUserListBox
+     */
     private synchronized void updateClientsUserListBox(ListView<String> newUserListBox) {
         StringBuilder messageContents = new StringBuilder();
+
         messageContents.append("userlistboxupdate:");
         for (String user : newUserListBox.getItems()) {
             messageContents.append(user).append(",");
         }
         Message updateMessage = new Message(messageContents.toString(), serverName, Message.MESSAGE_TYPE.ACTION);
+
         sendMessage(updateMessage);
     }
 
@@ -188,8 +199,6 @@ public class Server extends ChatMemberWithUIElements {
                 sendMessage(exitMessage);
                 appendMessageToChatBox(exitMessage);
                 break;
-            default:
-                throw new UnsupportedOperationException("Unknown request was received from a client.");
         }
     }
 

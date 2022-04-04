@@ -35,7 +35,7 @@ public class ServerScanner {
 
         //Scan network
         List<String> availableServers = new ArrayList<>();
-        Map<String, Boolean> scanResults = scanNetwork(localhostIp, Settings.PORT);
+        Map<String, Boolean> scanResults = scanNetwork(localhostIp, Settings.getPort());
 
         for (String ip : scanResults.keySet()) {
             if (scanResults.get(ip)) {

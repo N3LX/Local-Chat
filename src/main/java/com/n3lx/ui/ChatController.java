@@ -1,7 +1,7 @@
 package com.n3lx.ui;
 
 
-import com.n3lx.chat.ChatMemberWithUIElements;
+import com.n3lx.chat.ChatMember;
 import com.n3lx.chat.client.Client;
 import com.n3lx.chat.server.Server;
 import javafx.scene.control.Button;
@@ -9,6 +9,10 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 
+/**
+ * A class that allows the UI to communicate with classes that make the chat activity possible.
+ * It needs to be fed all required UI elements via methods starting with "link" in their name in order to run
+ */
 public class ChatController {
 
     private static ChatController instance;
@@ -24,7 +28,7 @@ public class ChatController {
     private Button sendButton;
     private TextField messageTextField;
 
-    private ChatMemberWithUIElements chatClass;
+    private ChatMember chatClass;
 
     private ChatController() {
 
@@ -42,6 +46,8 @@ public class ChatController {
             return;
         }
         chatClass.stop();
+
+        //Restore the UI elements to their original state from application startup
         chatClass = null;
         connectButton.setDisable(false);
         disconnectButton.setDisable(true);
@@ -52,8 +58,15 @@ public class ChatController {
         messageTextField.setDisable(true);
     }
 
-    public void startChat(ChatMemberWithUIElements chatClass) {
+    public void startChat(ChatMember chatClass) {
+        if (!checkIfAllUIElementsWereProvided() && chatClass != null) {
+            throw new NullPointerException("ChatController class did not receive all necessary references to continue\n" +
+                    "This is a critical error and ass such application stability is no longer guaranteed\n");
+        }
+
         this.chatClass = chatClass;
+
+        //Depending on the instance type some UI elements will need to be modified to avoid unwanted use-cases.
         if (chatClass instanceof Server) {
             connectButton.setDisable(true);
             disconnectButton.setDisable(true);
@@ -78,6 +91,7 @@ public class ChatController {
             messageTextField.setDisable(false);
         }
 
+        //Start the chat
         chatClass.start();
     }
 
@@ -108,6 +122,19 @@ public class ChatController {
 
     public ListView<String> getUserListBox() {
         return userListBox;
+    }
+
+    private boolean checkIfAllUIElementsWereProvided() {
+        if (chatBox == null || userListBox == null) {
+            return false;
+        }
+        if (connectButton == null || disconnectButton == null || hostButton == null || stopHostingButton == null) {
+            return false;
+        }
+        if (messageTextField == null || sendButton == null) {
+            return false;
+        }
+        return true;
     }
 
 }

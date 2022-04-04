@@ -31,10 +31,9 @@ public class ConnectionWindow extends DialogWindow {
 
     public ConnectionWindow(Stage parentStage) {
         super(parentStage);
-        createUI();
     }
 
-    private void createUI() {
+    protected void createUI() {
         GridPane windowContent = new GridPane();
         windowContent.setVgap(VERTICAL_SPACING);
         windowContent.setHgap(HORIZONTAL_SPACING);

@@ -20,6 +20,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.stream.DoubleStream;
 
+/**
+ * The main window of the application, actions (setting button behaviour) not related to server/client connection
+ * are also declared here. Server/Client specific actions are set via ChatController class.
+ */
 public class LocalChatApp extends Application {
 
     private static final double WINDOW_MIN_WIDTH = 600;
