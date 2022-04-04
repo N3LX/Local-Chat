@@ -5,20 +5,18 @@ import javafx.stage.Stage;
 
 public abstract class DialogWindow {
 
-    Stage parentStage;
-
-    Stage windowStage;
+    protected final Stage windowStage;
 
     /*
     Make the constructor package-private so that the abstract class cannot be instantiated
     */
     DialogWindow(Stage parentStage) {
-        this.parentStage = parentStage;
         windowStage = new Stage();
-        anchorToParentStage();
+        anchorToParentStage(parentStage);
+        createUI();
     }
 
-    private void anchorToParentStage() {
+    private void anchorToParentStage(Stage parentStage) {
         windowStage.initOwner(parentStage);
         windowStage.initModality(Modality.APPLICATION_MODAL);
     }
@@ -26,5 +24,7 @@ public abstract class DialogWindow {
     public Stage getWindow() {
         return windowStage;
     }
+
+    protected abstract void createUI();
 
 }

@@ -1,6 +1,6 @@
 package com.n3lx.chat.util.serverscanner;
 
-import com.n3lx.chat.Message;
+import com.n3lx.chat.util.Message;
 import com.n3lx.chat.util.SocketStream;
 
 import java.io.IOException;

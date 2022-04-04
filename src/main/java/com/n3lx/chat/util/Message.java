@@ -1,4 +1,4 @@
-package com.n3lx.chat;
+package com.n3lx.chat.util;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -44,8 +44,9 @@ public class Message implements Serializable {
     }
 
     /*
-        Enum that will allow the server/client classes to differentiate between end user and server-client communication
-        */
+    Enum that will allow the server/client classes to differentiate between end user
+    and backend/"under the hood" communication.
+     */
     public enum MESSAGE_TYPE {STANDARD, ACTION}
 
 }

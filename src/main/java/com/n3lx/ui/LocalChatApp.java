@@ -20,6 +20,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.stream.DoubleStream;
 
+/**
+ * The main window of the application, actions (setting button behaviour) not related to server/client connection
+ * are also declared here. Server/Client specific actions are set via ChatController class.
+ */
 public class LocalChatApp extends Application {
 
     private static final double WINDOW_MIN_WIDTH = 600;
@@ -94,6 +98,11 @@ public class LocalChatApp extends Application {
             fileChooser.getExtensionFilters()
                     .add(new FileChooser.ExtensionFilter("Text files (*.txt)", "*.txt"));
             File targetFile = fileChooser.showSaveDialog(mainStage);
+
+            //Check if user has chosen the file location
+            if (targetFile == null) {
+                return;
+            }
 
             boolean wasOperationSuccessful;
             try {

@@ -20,10 +20,9 @@ public class AlertWindow extends DialogWindow {
     public AlertWindow(Stage parentStage, String alertMessage) {
         super(parentStage);
         this.alertMessage = alertMessage;
-        createUI();
     }
 
-    private void createUI() {
+    protected void createUI() {
         VBox windowContent = new VBox();
         windowContent.setAlignment(Pos.CENTER);
         windowContent.setSpacing(VERTICAL_SPACING);
