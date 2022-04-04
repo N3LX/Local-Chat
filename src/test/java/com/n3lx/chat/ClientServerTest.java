@@ -106,11 +106,13 @@ public class ClientServerTest extends ApplicationTest {
         //Wait for 200ms for client to register that server has disconnected
         Thread.sleep(200);
 
-        assertEquals(4, clientChatBox.getItems().size());
+        assertEquals(5, clientChatBox.getItems().size());
         assertEquals("Test server: Welcome to Test server", clientChatBox.getItems().get(0));
         assertEquals("Test server: Message of the day:\n", clientChatBox.getItems().get(1));
         assertEquals("Test server: Client joined the chat.", clientChatBox.getItems().get(2));
         assertEquals("Test server: Server is shutting down...", clientChatBox.getItems().get(3));
+        assertEquals("System: Connection to server has been lost, application will now disconnect.",
+                clientChatBox.getItems().get(4));
 
         client.stop();
     }
