@@ -128,9 +128,9 @@ public class Server extends ChatMemberWithUIElements {
     private void startMessageHandler() {
         Runnable messageHandler = () -> {
             while (!serverSocket.isClosed()) {
-                for (SocketStream client : clientStreams.values()) {
+                for (String clientName : clientStreams.keySet()) {
                     try {
-                        Message message = (Message) client.getObjectInputStream().readObject();
+                        Message message = (Message) clientStreams.get(clientName).getObjectInputStream().readObject();
 
                         switch (message.getMessageType()) {
                             case STANDARD -> {
@@ -141,8 +141,14 @@ public class Server extends ChatMemberWithUIElements {
                         }
                     } catch (SocketTimeoutException ignored) {
                         //No activity on the socket, can proceed further
-                    } catch (ClassNotFoundException | IOException ignored) {
+                    } catch (ClassNotFoundException | IOException e) {
+                        disconnectClient(clientName);
 
+                        //Send a message to other clients about this event as well
+                        var exitMessage = new Message(clientName + " has disconnected from the chat."
+                                , serverName, Message.MESSAGE_TYPE.STANDARD);
+                        sendMessage(exitMessage);
+                        appendMessageToChatBox(exitMessage);
                     }
                 }
             }
@@ -174,20 +180,7 @@ public class Server extends ChatMemberWithUIElements {
         String action = message.getMessage().split(":")[0];
         switch (action) {
             case "disconnect":
-                //Close connection to the client and remove it from the clientStreams list
-                try {
-                    clientStreams.get(message.getUsername()).close();
-                } catch (IOException e) {
-                    LOGGER.log(Level.FINE, "A problem has occurred during disconnection from the client", e);
-                }
-                clientStreams.remove(message.getUsername());
-
-                //Remove the client for userBoxList and inform other clients about the change
-                var newUserListBox = new ListView<String>();
-                newUserListBox.getItems().addAll(userListBox.getItems());
-                newUserListBox.getItems().remove(message.getUsername());
-                updateLocalUserListBox(newUserListBox);
-                updateClientsUserListBox(newUserListBox);
+                disconnectClient(message.getUsername());
 
                 //Send a message to other clients about this event as well
                 var exitMessage = new Message(message.getUsername() + " has left the chat."
@@ -198,6 +191,23 @@ public class Server extends ChatMemberWithUIElements {
             default:
                 throw new UnsupportedOperationException("Unknown request was received from a client.");
         }
+    }
+
+    private synchronized void disconnectClient(String username) {
+        //Close connection to the client and remove it from the clientStreams list
+        try {
+            clientStreams.get(username).close();
+        } catch (IOException e) {
+            LOGGER.log(Level.FINE, "A problem has occurred during disconnection from the client", e);
+        }
+        clientStreams.remove(username);
+
+        //Remove the client for userBoxList and inform other clients about the change
+        var newUserListBox = new ListView<String>();
+        newUserListBox.getItems().addAll(userListBox.getItems());
+        newUserListBox.getItems().remove(username);
+        updateLocalUserListBox(newUserListBox);
+        updateClientsUserListBox(newUserListBox);
     }
 
 }
