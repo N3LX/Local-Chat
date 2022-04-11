@@ -10,7 +10,8 @@ import java.text.NumberFormat;
 import java.time.LocalDateTime;
 
 /**
- * A class that contains some common variables/methods that both Server and Client classes implement in identical way.
+ * Classes implementing this abstract class server as a model for ChatController and LocalChatApp view.
+ * An abstract class that contains some common variables/methods that child classes implement in identical way.
  */
 public abstract class ChatMember {
 

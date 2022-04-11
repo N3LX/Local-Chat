@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.stream.DoubleStream;
 
 /**
+ * This class servers as view for ChatController.
  * The main window of the application, actions (setting button behaviour) not related to server/client connection
  * are also declared here. Server/Client specific actions are set via ChatController class.
  */

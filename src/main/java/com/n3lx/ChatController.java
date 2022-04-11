@@ -10,7 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 
 /**
- * A class that allows the UI to communicate with classes that make the chat activity possible.
+ * A controller for LocalChatApp view and ChatMember model
  * It needs to be fed all required UI elements via methods starting with "link" in their name in order to run
  */
 public class ChatController {
