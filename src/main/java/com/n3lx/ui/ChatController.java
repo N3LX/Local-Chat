@@ -61,7 +61,7 @@ public class ChatController {
     public void startChat(ChatMember chatClass) {
         if (!checkIfAllUIElementsWereProvided() && chatClass != null) {
             throw new NullPointerException("ChatController class did not receive all necessary references to continue\n" +
-                    "This is a critical error and ass such application stability is no longer guaranteed\n");
+                    "This is a critical error and as such application stability is no longer guaranteed\n");
         }
 
         this.chatClass = chatClass;
