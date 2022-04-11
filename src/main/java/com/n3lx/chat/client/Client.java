@@ -136,7 +136,7 @@ public class Client extends ChatMember {
                             "System",
                             Message.MESSAGE_TYPE.STANDARD);
                     appendMessageToChatBox(serverInterruptMessage);
-                    ChatController.getInstance().stop();
+                    ChatController.getInstance().stopChat();
                     return;
                 } catch (ClassNotFoundException | IOException e) {
                     LOGGER.log(Level.WARNING, "Could not parse incoming message", e);
@@ -158,7 +158,7 @@ public class Client extends ChatMember {
                 updateLocalUserListBox(newUserListBox);
                 break;
             case "shutdown":
-                ChatController.getInstance().stop();
+                ChatController.getInstance().stopChat();
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown request was received from server.");
