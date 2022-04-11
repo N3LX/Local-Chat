@@ -95,22 +95,22 @@ public class ChatController {
         chatClass.start();
     }
 
-    public void linkChatBox(ListView<String> chatBox) {
+    public void registerChatBox(ListView<String> chatBox) {
         this.chatBox = chatBox;
     }
 
-    public void linkUserListBox(ListView<String> userListBox) {
+    public void registerUserListBox(ListView<String> userListBox) {
         this.userListBox = userListBox;
     }
 
-    public void linkChatMenuBarButtons(MenuItem connectButton, MenuItem disconnectButton, MenuItem hostButton, MenuItem stopHostingButton) {
+    public void registerChatMenuBarButtons(MenuItem connectButton, MenuItem disconnectButton, MenuItem hostButton, MenuItem stopHostingButton) {
         this.connectButton = connectButton;
         this.disconnectButton = disconnectButton;
         this.hostButton = hostButton;
         this.stopHostingButton = stopHostingButton;
     }
 
-    public void linkMessageBox(TextField messageTextField, Button sendButton) {
+    public void registerMessageBox(TextField messageTextField, Button sendButton) {
         this.messageTextField = messageTextField;
         this.sendButton = sendButton;
     }

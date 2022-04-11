@@ -85,7 +85,7 @@ public class LocalChatApp extends Application {
         chatMenuItem4.setDisable(true);
 
         chatMenu.getItems().addAll(chatMenuItem1, chatMenuItem2, new SeparatorMenuItem(), chatMenuItem3, chatMenuItem4);
-        ChatController.getInstance().linkChatMenuBarButtons(chatMenuItem1, chatMenuItem2, chatMenuItem3, chatMenuItem4);
+        ChatController.getInstance().registerChatMenuBarButtons(chatMenuItem1, chatMenuItem2, chatMenuItem3, chatMenuItem4);
 
         Menu toolsMenu = new Menu("Tools");
 
@@ -199,7 +199,7 @@ public class LocalChatApp extends Application {
 
         ListView<String> chatBox = new ListView<>();
 
-        ChatController.getInstance().linkChatBox(chatBox);
+        ChatController.getInstance().registerChatBox(chatBox);
         chatPane.getChildren().addAll(chatBox, createMessageBox());
         VBox.setVgrow(chatBox, Priority.ALWAYS);
         return chatPane;
@@ -215,7 +215,7 @@ public class LocalChatApp extends Application {
         Button sendButton = new Button("Send");
         sendButton.setDisable(true);
 
-        ChatController.getInstance().linkMessageBox(messageTextField, sendButton);
+        ChatController.getInstance().registerMessageBox(messageTextField, sendButton);
         messageBox.getChildren().addAll(messageTextField, sendButton);
         messageBox.getChildren().forEach(node -> HBox.setHgrow(node, Priority.ALWAYS));
         return messageBox;
@@ -229,7 +229,7 @@ public class LocalChatApp extends Application {
         Label userListLabel = new Label("Connected users");
         ListView<String> userList = new ListView<>();
 
-        ChatController.getInstance().linkUserListBox(userList);
+        ChatController.getInstance().registerUserListBox(userList);
         userListPane.getChildren().addAll(userListLabel, userList);
         userListPane.getChildren().forEach(node -> VBox.setVgrow(node, Priority.ALWAYS));
         return userListPane;
