@@ -76,13 +76,11 @@ public class LocalChatApp extends Application {
         chatMenuItem1.setOnAction(actionEvent -> new ConnectionWindow(mainStage).getWindow().show());
 
         MenuItem chatMenuItem2 = new MenuItem("Disconnect");
-        chatMenuItem2.setDisable(true);
 
         MenuItem chatMenuItem3 = new MenuItem("Host...");
         chatMenuItem3.setOnAction(actionEvent -> new HostWindow(mainStage).getWindow().show());
 
         MenuItem chatMenuItem4 = new MenuItem("Stop hosting");
-        chatMenuItem4.setDisable(true);
 
         chatMenu.getItems().addAll(chatMenuItem1, chatMenuItem2, new SeparatorMenuItem(), chatMenuItem3, chatMenuItem4);
         ChatController.getInstance().registerChatMenuBarButtons(chatMenuItem1, chatMenuItem2, chatMenuItem3, chatMenuItem4);
@@ -211,9 +209,7 @@ public class LocalChatApp extends Application {
         messageBox.setAlignment(Pos.CENTER);
 
         TextField messageTextField = new TextField();
-        messageTextField.setDisable(true);
         Button sendButton = new Button("Send");
-        sendButton.setDisable(true);
 
         ChatController.getInstance().registerMessageBox(messageTextField, sendButton);
         messageBox.getChildren().addAll(messageTextField, sendButton);

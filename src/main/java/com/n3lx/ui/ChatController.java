@@ -30,8 +30,10 @@ public class ChatController {
 
     private ChatMember chatClass;
 
-    private ChatController() {
+    private boolean isRunning;
 
+    private ChatController() {
+        isRunning = false;
     }
 
     public static ChatController getInstance() {
@@ -47,21 +49,24 @@ public class ChatController {
         }
         chatClass.stop();
 
-        //Restore the UI elements to their original state from application startup
+        //Make it not possible to restart the chat session with the same chatClass instance.
         chatClass = null;
-        connectButton.setDisable(false);
-        disconnectButton.setDisable(true);
-        hostButton.setDisable(false);
-        stopHostingButton.setDisable(true);
-        sendButton.setDisable(true);
-        messageTextField.clear();
-        messageTextField.setDisable(true);
+
+        //Restore the UI elements to their original state from application startup
+        setInitialUIState();
+
+        isRunning = false;
     }
 
     public void startChat(ChatMember chatClass) {
         if (!checkIfAllUIElementsWereProvided() && chatClass != null) {
             throw new NullPointerException("ChatController class did not receive all necessary references to continue\n" +
                     "This is a critical error and as such application stability is no longer guaranteed\n");
+        }
+
+        if (isRunning) {
+            throw new IllegalStateException("Cannot invoke startChat() as the session in this " +
+                    "instance is already running");
         }
 
         this.chatClass = chatClass;
@@ -93,26 +98,40 @@ public class ChatController {
 
         //Start the chat
         chatClass.start();
+        isRunning = true;
     }
 
     public void registerChatBox(ListView<String> chatBox) {
-        this.chatBox = chatBox;
+        if (!isRunning) {
+            this.chatBox = chatBox;
+            setInitialUIState();
+        }
     }
 
     public void registerUserListBox(ListView<String> userListBox) {
-        this.userListBox = userListBox;
+        if (!isRunning) {
+            this.userListBox = userListBox;
+            setInitialUIState();
+        }
     }
 
-    public void registerChatMenuBarButtons(MenuItem connectButton, MenuItem disconnectButton, MenuItem hostButton, MenuItem stopHostingButton) {
-        this.connectButton = connectButton;
-        this.disconnectButton = disconnectButton;
-        this.hostButton = hostButton;
-        this.stopHostingButton = stopHostingButton;
+    public void registerChatMenuBarButtons(MenuItem connectButton, MenuItem disconnectButton,
+                                           MenuItem hostButton, MenuItem stopHostingButton) {
+        if (!isRunning) {
+            this.connectButton = connectButton;
+            this.disconnectButton = disconnectButton;
+            this.hostButton = hostButton;
+            this.stopHostingButton = stopHostingButton;
+            setInitialUIState();
+        }
     }
 
     public void registerMessageBox(TextField messageTextField, Button sendButton) {
-        this.messageTextField = messageTextField;
-        this.sendButton = sendButton;
+        if (!isRunning) {
+            this.messageTextField = messageTextField;
+            this.sendButton = sendButton;
+            setInitialUIState();
+        }
     }
 
 
@@ -135,6 +154,18 @@ public class ChatController {
             return false;
         }
         return true;
+    }
+
+    private void setInitialUIState() {
+        if (checkIfAllUIElementsWereProvided()) {
+            connectButton.setDisable(false);
+            disconnectButton.setDisable(true);
+            hostButton.setDisable(false);
+            stopHostingButton.setDisable(true);
+            sendButton.setDisable(true);
+            messageTextField.clear();
+            messageTextField.setDisable(true);
+        }
     }
 
 }
