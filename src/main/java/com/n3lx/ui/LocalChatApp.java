@@ -1,6 +1,7 @@
 package com.n3lx.ui;
 
 
+import com.n3lx.ChatController;
 import com.n3lx.ui.dialogwindows.AlertWindow;
 import com.n3lx.ui.dialogwindows.ConnectionWindow;
 import com.n3lx.ui.dialogwindows.HostWindow;

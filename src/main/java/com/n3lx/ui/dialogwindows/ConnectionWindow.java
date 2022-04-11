@@ -1,8 +1,8 @@
 package com.n3lx.ui.dialogwindows;
 
+import com.n3lx.ChatController;
 import com.n3lx.chat.client.Client;
 import com.n3lx.chat.util.serverscanner.ServerScanner;
-import com.n3lx.ui.ChatController;
 import com.n3lx.ui.util.Preferences;
 import javafx.application.Platform;
 import javafx.geometry.Insets;

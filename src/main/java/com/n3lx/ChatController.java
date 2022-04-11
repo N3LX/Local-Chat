@@ -1,4 +1,4 @@
-package com.n3lx.ui;
+package com.n3lx;
 
 
 import com.n3lx.chat.ChatMember;

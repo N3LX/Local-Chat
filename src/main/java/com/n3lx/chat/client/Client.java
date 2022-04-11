@@ -1,11 +1,11 @@
 package com.n3lx.chat.client;
 
+import com.n3lx.ChatController;
 import com.n3lx.chat.ChatMember;
 import com.n3lx.chat.server.Server;
 import com.n3lx.chat.util.Message;
 import com.n3lx.chat.util.Settings;
 import com.n3lx.chat.util.SocketStream;
-import com.n3lx.ui.ChatController;
 import javafx.application.Platform;
 import javafx.scene.control.ListView;
 

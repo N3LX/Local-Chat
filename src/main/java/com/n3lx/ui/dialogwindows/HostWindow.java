@@ -1,7 +1,7 @@
 package com.n3lx.ui.dialogwindows;
 
+import com.n3lx.ChatController;
 import com.n3lx.chat.server.Server;
-import com.n3lx.ui.ChatController;
 import com.n3lx.ui.util.Preferences;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
