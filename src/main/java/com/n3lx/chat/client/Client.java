@@ -1,11 +1,11 @@
 package com.n3lx.chat.client;
 
+import com.n3lx.ChatController;
 import com.n3lx.chat.ChatMember;
 import com.n3lx.chat.server.Server;
 import com.n3lx.chat.util.Message;
 import com.n3lx.chat.util.Settings;
 import com.n3lx.chat.util.SocketStream;
-import com.n3lx.ui.ChatController;
 import javafx.application.Platform;
 import javafx.scene.control.ListView;
 
@@ -36,6 +36,9 @@ public class Client extends ChatMember {
         this.userName = userName;
     }
 
+    /**
+     * Join the chat session based on the parameters provided in the constructor.
+     */
     public void start() {
         connect();
         performHandshakeWithServer();
@@ -44,6 +47,9 @@ public class Client extends ChatMember {
         startMessageHandler();
     }
 
+    /**
+     * Leave the chat session
+     */
     public void stop() {
         try {
             //Inform the server about leaving
@@ -62,9 +68,9 @@ public class Client extends ChatMember {
     }
 
     /**
-     * Send a string representing a message.
+     * Send a message, the message will be wrapped in Message object
      *
-     * @param message
+     * @param message String with a message that user would like to send
      */
     public void sendMessage(String message) {
         try {
@@ -76,9 +82,9 @@ public class Client extends ChatMember {
     }
 
     /**
-     * Send a message object. This is mainly used for internal calls to communicate with server
+     * Send a message object, this method is mainly used for internal calls to communicate with server
      *
-     * @param message
+     * @param message A message object
      */
     private void sendMessage(Message message) {
         try {
@@ -90,6 +96,9 @@ public class Client extends ChatMember {
         }
     }
 
+    /**
+     * Connects the socket to the server
+     */
     private void connect() {
         try {
             socket = new Socket(ipAddress, Settings.getPort());
@@ -101,6 +110,9 @@ public class Client extends ChatMember {
         }
     }
 
+    /**
+     * Performs a handshake with the server
+     */
     private void performHandshakeWithServer() {
         try {
             //Expect server to provide its name and welcome message
@@ -116,6 +128,10 @@ public class Client extends ChatMember {
         }
     }
 
+    /**
+     * Creates and executes the Runnable that will handle receiving messages from the server and presenting them
+     * to the end user
+     */
     private void startMessageHandler() {
         Runnable messageHandler = () -> {
             while (!socket.isClosed()) {
@@ -136,7 +152,7 @@ public class Client extends ChatMember {
                             "System",
                             Message.MESSAGE_TYPE.STANDARD);
                     appendMessageToChatBox(serverInterruptMessage);
-                    ChatController.getInstance().stop();
+                    ChatController.getInstance().stopChat();
                     return;
                 } catch (ClassNotFoundException | IOException e) {
                     LOGGER.log(Level.WARNING, "Could not parse incoming message", e);
@@ -146,22 +162,33 @@ public class Client extends ChatMember {
         clientThreads.submit(messageHandler);
     }
 
+    /**
+     * If message type was ACTION then try to interpret the request and process it if matching string was made
+     *
+     * @param message A Message object with a message string that contains the command to be processed
+     */
     private void processActionMessage(Message message) {
         String action = message.getMessage().split(":")[0];
         switch (action) {
-            case "userlistboxupdate":
+            case "userlistboxupdate" -> {
+                // This command when coming from the server should look like this:
+                // userlistboxupdate:user1,user2,user3...
+                // Based on it the user list on the client side will replace the whole list with new users
                 String[] users = message.getMessage().split(":")[1].split(",");
                 var newUserListBox = new ListView<String>();
                 for (String user : users) {
                     newUserListBox.getItems().add(user);
                 }
                 updateLocalUserListBox(newUserListBox);
-                break;
-            case "shutdown":
-                ChatController.getInstance().stop();
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown request was received from server.");
+            }
+            case "shutdown" ->
+                    //This command doesn't have additional parameters after ":" sign
+                    ChatController.getInstance().stopChat();
+            default -> {
+                String error = "Unknown request was received from server:" + "\n" +
+                        "Command that was attempted to be invoked: " + message.getMessage();
+                LOGGER.log(Level.WARNING, error);
+            }
         }
     }
 

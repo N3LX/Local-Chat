@@ -1,7 +1,8 @@
 package com.n3lx.ui.dialogwindows;
 
+import com.n3lx.ChatController;
 import com.n3lx.chat.server.Server;
-import com.n3lx.ui.ChatController;
+import com.n3lx.chat.util.serverscanner.ServerScanner;
 import com.n3lx.ui.util.Preferences;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -76,6 +77,14 @@ public class HostWindow extends DialogWindow {
 
         Button connectButton = new Button("Host");
         connectButton.setOnAction(actionEvent -> {
+            //Check if socket is not being used first
+            if (checkIfSocketIsInUse()) {
+                showAlert("Cannot create the server as this computer" +
+                        " already hosts one using Java Socket library");
+                return;
+            }
+
+            //If input is valid, start the server
             String serverName = serverNameTextField.getText();
             String serverMessage = serverMessageTextArea.getText();
             if (validateInput(serverName, serverMessage)) {
@@ -85,7 +94,7 @@ public class HostWindow extends DialogWindow {
                 ChatController.getInstance().startChat(server);
                 windowStage.close();
             } else {
-                showAlert();
+                showAlert("None of the fields can be empty!");
             }
         });
 
@@ -112,10 +121,13 @@ public class HostWindow extends DialogWindow {
         return true;
     }
 
-    private void showAlert() {
-        String alertMessage = "All fields cannot be empty!";
+    private void showAlert(String alertMessage) {
         AlertWindow alertWindow = new AlertWindow(windowStage, alertMessage);
         alertWindow.getWindow().show();
+    }
+
+    private boolean checkIfSocketIsInUse() {
+        return ServerScanner.getListOfOnlineServers().contains(ServerScanner.getLocalhostIP());
     }
 
 }

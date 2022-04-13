@@ -1,4 +1,4 @@
-package com.n3lx.ui;
+package com.n3lx;
 
 
 import com.n3lx.chat.ChatMember;
@@ -10,7 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 
 /**
- * A class that allows the UI to communicate with classes that make the chat activity possible.
+ * A controller for LocalChatApp view and ChatMember model
  * It needs to be fed all required UI elements via methods starting with "link" in their name in order to run
  */
 public class ChatController {
@@ -30,8 +30,10 @@ public class ChatController {
 
     private ChatMember chatClass;
 
-    private ChatController() {
+    private boolean isRunning;
 
+    private ChatController() {
+        isRunning = false;
     }
 
     public static ChatController getInstance() {
@@ -41,27 +43,30 @@ public class ChatController {
         return instance;
     }
 
-    public void stop() {
+    public void stopChat() {
         if (chatClass == null) {
             return;
         }
         chatClass.stop();
 
-        //Restore the UI elements to their original state from application startup
+        //Make it not possible to restart the chat session with the same chatClass instance.
         chatClass = null;
-        connectButton.setDisable(false);
-        disconnectButton.setDisable(true);
-        hostButton.setDisable(false);
-        stopHostingButton.setDisable(true);
-        sendButton.setDisable(true);
-        messageTextField.clear();
-        messageTextField.setDisable(true);
+
+        //Restore the UI elements to their original state from application startup
+        setInitialUIState();
+
+        isRunning = false;
     }
 
     public void startChat(ChatMember chatClass) {
-        if (!checkIfAllUIElementsWereProvided() && chatClass != null) {
+        if (!checkIfAllUIElementsWereProvided() || chatClass == null) {
             throw new NullPointerException("ChatController class did not receive all necessary references to continue\n" +
-                    "This is a critical error and ass such application stability is no longer guaranteed\n");
+                    "This is a critical error and as such application stability is no longer guaranteed\n");
+        }
+
+        if (isRunning) {
+            throw new IllegalStateException("Cannot invoke startChat() as the session in this " +
+                    "instance is already running");
         }
 
         this.chatClass = chatClass;
@@ -72,14 +77,14 @@ public class ChatController {
             disconnectButton.setDisable(true);
             hostButton.setDisable(true);
             stopHostingButton.setDisable(false);
-            stopHostingButton.setOnAction(actionEvent -> stop());
+            stopHostingButton.setOnAction(actionEvent -> stopChat());
             sendButton.setDisable(true);
             messageTextField.setDisable(true);
         } else {
             Client client = (Client) chatClass;
             connectButton.setDisable(true);
             disconnectButton.setDisable(false);
-            disconnectButton.setOnAction(actionEvent -> stop());
+            disconnectButton.setOnAction(actionEvent -> stopChat());
             hostButton.setDisable(true);
             stopHostingButton.setDisable(true);
             sendButton.setDisable(false);
@@ -93,26 +98,40 @@ public class ChatController {
 
         //Start the chat
         chatClass.start();
+        isRunning = true;
     }
 
-    public void linkChatBox(ListView<String> chatBox) {
-        this.chatBox = chatBox;
+    public void registerChatBox(ListView<String> chatBox) {
+        if (!isRunning) {
+            this.chatBox = chatBox;
+            setInitialUIState();
+        }
     }
 
-    public void linkUserListBox(ListView<String> userListBox) {
-        this.userListBox = userListBox;
+    public void registerUserListBox(ListView<String> userListBox) {
+        if (!isRunning) {
+            this.userListBox = userListBox;
+            setInitialUIState();
+        }
     }
 
-    public void linkChatMenuBarButtons(MenuItem connectButton, MenuItem disconnectButton, MenuItem hostButton, MenuItem stopHostingButton) {
-        this.connectButton = connectButton;
-        this.disconnectButton = disconnectButton;
-        this.hostButton = hostButton;
-        this.stopHostingButton = stopHostingButton;
+    public void registerChatMenuBarButtons(MenuItem connectButton, MenuItem disconnectButton,
+                                           MenuItem hostButton, MenuItem stopHostingButton) {
+        if (!isRunning) {
+            this.connectButton = connectButton;
+            this.disconnectButton = disconnectButton;
+            this.hostButton = hostButton;
+            this.stopHostingButton = stopHostingButton;
+            setInitialUIState();
+        }
     }
 
-    public void linkMessageBox(TextField messageTextField, Button sendButton) {
-        this.messageTextField = messageTextField;
-        this.sendButton = sendButton;
+    public void registerMessageBox(TextField messageTextField, Button sendButton) {
+        if (!isRunning) {
+            this.messageTextField = messageTextField;
+            this.sendButton = sendButton;
+            setInitialUIState();
+        }
     }
 
 
@@ -135,6 +154,18 @@ public class ChatController {
             return false;
         }
         return true;
+    }
+
+    private void setInitialUIState() {
+        if (checkIfAllUIElementsWereProvided()) {
+            connectButton.setDisable(false);
+            disconnectButton.setDisable(true);
+            hostButton.setDisable(false);
+            stopHostingButton.setDisable(true);
+            sendButton.setDisable(true);
+            messageTextField.clear();
+            messageTextField.setDisable(true);
+        }
     }
 
 }

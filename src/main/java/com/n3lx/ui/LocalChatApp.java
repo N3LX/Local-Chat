@@ -1,6 +1,7 @@
 package com.n3lx.ui;
 
 
+import com.n3lx.ChatController;
 import com.n3lx.ui.dialogwindows.AlertWindow;
 import com.n3lx.ui.dialogwindows.ConnectionWindow;
 import com.n3lx.ui.dialogwindows.HostWindow;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.stream.DoubleStream;
 
 /**
+ * This class servers as view for ChatController.
  * The main window of the application, actions (setting button behaviour) not related to server/client connection
  * are also declared here. Server/Client specific actions are set via ChatController class.
  */
@@ -46,7 +48,7 @@ public class LocalChatApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         mainStage = stage;
-        mainStage.setOnCloseRequest(windowEvent -> ChatController.getInstance().stop());
+        mainStage.setOnCloseRequest(windowEvent -> ChatController.getInstance().stopChat());
 
         VBox root = new VBox();
         root.getChildren().add(createMenuBar());
@@ -76,16 +78,14 @@ public class LocalChatApp extends Application {
         chatMenuItem1.setOnAction(actionEvent -> new ConnectionWindow(mainStage).getWindow().show());
 
         MenuItem chatMenuItem2 = new MenuItem("Disconnect");
-        chatMenuItem2.setDisable(true);
 
         MenuItem chatMenuItem3 = new MenuItem("Host...");
         chatMenuItem3.setOnAction(actionEvent -> new HostWindow(mainStage).getWindow().show());
 
         MenuItem chatMenuItem4 = new MenuItem("Stop hosting");
-        chatMenuItem4.setDisable(true);
 
         chatMenu.getItems().addAll(chatMenuItem1, chatMenuItem2, new SeparatorMenuItem(), chatMenuItem3, chatMenuItem4);
-        ChatController.getInstance().linkChatMenuBarButtons(chatMenuItem1, chatMenuItem2, chatMenuItem3, chatMenuItem4);
+        ChatController.getInstance().registerChatMenuBarButtons(chatMenuItem1, chatMenuItem2, chatMenuItem3, chatMenuItem4);
 
         Menu toolsMenu = new Menu("Tools");
 
@@ -199,7 +199,7 @@ public class LocalChatApp extends Application {
 
         ListView<String> chatBox = new ListView<>();
 
-        ChatController.getInstance().linkChatBox(chatBox);
+        ChatController.getInstance().registerChatBox(chatBox);
         chatPane.getChildren().addAll(chatBox, createMessageBox());
         VBox.setVgrow(chatBox, Priority.ALWAYS);
         return chatPane;
@@ -211,11 +211,9 @@ public class LocalChatApp extends Application {
         messageBox.setAlignment(Pos.CENTER);
 
         TextField messageTextField = new TextField();
-        messageTextField.setDisable(true);
         Button sendButton = new Button("Send");
-        sendButton.setDisable(true);
 
-        ChatController.getInstance().linkMessageBox(messageTextField, sendButton);
+        ChatController.getInstance().registerMessageBox(messageTextField, sendButton);
         messageBox.getChildren().addAll(messageTextField, sendButton);
         messageBox.getChildren().forEach(node -> HBox.setHgrow(node, Priority.ALWAYS));
         return messageBox;
@@ -229,7 +227,7 @@ public class LocalChatApp extends Application {
         Label userListLabel = new Label("Connected users");
         ListView<String> userList = new ListView<>();
 
-        ChatController.getInstance().linkUserListBox(userList);
+        ChatController.getInstance().registerUserListBox(userList);
         userListPane.getChildren().addAll(userListLabel, userList);
         userListPane.getChildren().forEach(node -> VBox.setVgrow(node, Priority.ALWAYS));
         return userListPane;
@@ -237,7 +235,7 @@ public class LocalChatApp extends Application {
 
     @Override
     public void stop() {
-        ChatController.getInstance().stop();
+        ChatController.getInstance().stopChat();
     }
 
 }

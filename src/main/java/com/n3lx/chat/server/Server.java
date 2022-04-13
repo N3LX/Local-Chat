@@ -35,6 +35,9 @@ public class Server extends ChatMember {
         this.welcomeMessage = welcomeMessage;
     }
 
+    /**
+     * Starts the server
+     */
     public void start() {
         try {
             serverSocket = new ServerSocket(Settings.getPort());
@@ -53,6 +56,9 @@ public class Server extends ChatMember {
         }
     }
 
+    /**
+     * Stops the server
+     */
     public void stop() {
         try {
             //Inform the connected clients about shutdown
@@ -80,10 +86,10 @@ public class Server extends ChatMember {
         }
     }
 
+    /**
+     * Creates and executes the Runnable that will handle new incoming socket connections
+     */
     private void startIncomingConnectionHandler() {
-        /*
-        A runnable that will process all incoming connections
-        */
         Runnable incomingConnectionHandler = () -> {
             while (!serverSocket.isClosed()) {
                 try {
@@ -125,6 +131,10 @@ public class Server extends ChatMember {
         serverThreads.submit(incomingConnectionHandler);
     }
 
+    /**
+     * Creates and executes the Runnable that will handle receiving messages from all registered sockets and then
+     * distribute it to every client.
+     */
     private void startMessageHandler() {
         Runnable messageHandler = () -> {
             while (!serverSocket.isClosed()) {
@@ -159,6 +169,11 @@ public class Server extends ChatMember {
         serverThreads.submit(messageHandler);
     }
 
+    /**
+     * Sends a message
+     *
+     * @param message A Message object containing all the metadata that the client should receive
+     */
     private synchronized void sendMessage(Message message) {
         try {
             for (SocketStream recipient : clientStreams.values()) {
@@ -187,10 +202,16 @@ public class Server extends ChatMember {
         sendMessage(updateMessage);
     }
 
+    /**
+     * If message type was ACTION then try to interpret the request and process it if matching string was made
+     *
+     * @param message A Message object with a message string that contains the command to be processed
+     */
     private void processActionMessage(Message message) {
         String action = message.getMessage().split(":")[0];
         switch (action) {
-            case "disconnect":
+            case "disconnect" -> {
+                //This command doesn't have additional parameters after ":" sign
                 disconnectClient(message.getUsername());
 
                 //Send a message to other clients about this event as well
@@ -198,10 +219,20 @@ public class Server extends ChatMember {
                         , serverName, Message.MESSAGE_TYPE.STANDARD);
                 sendMessage(exitMessage);
                 appendMessageToChatBox(exitMessage);
-                break;
+            }
+            default -> {
+                String error = "Unknown request was received from server:" + "\n" +
+                        "Command that was attempted to be invoked: " + message.getMessage();
+                LOGGER.log(Level.WARNING, error);
+            }
         }
     }
 
+    /**
+     * Safely disconnects a client from the server
+     *
+     * @param username A username of a client to be disconnected
+     */
     private synchronized void disconnectClient(String username) {
         //Close connection to the client and remove it from the clientStreams list
         try {
