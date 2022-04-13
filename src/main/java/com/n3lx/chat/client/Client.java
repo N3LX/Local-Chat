@@ -170,7 +170,7 @@ public class Client extends ChatMember {
     private void processActionMessage(Message message) {
         String action = message.getMessage().split(":")[0];
         switch (action) {
-            case "userlistboxupdate":
+            case "userlistboxupdate" -> {
                 // This command when coming from the server should look like this:
                 // userlistboxupdate:user1,user2,user3...
                 // Based on it the user list on the client side will replace the whole list with new users
@@ -180,13 +180,15 @@ public class Client extends ChatMember {
                     newUserListBox.getItems().add(user);
                 }
                 updateLocalUserListBox(newUserListBox);
-                break;
-            case "shutdown":
-                //This command doesn't have additional parameters after ":" sign
-                ChatController.getInstance().stopChat();
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown request was received from server.");
+            }
+            case "shutdown" ->
+                    //This command doesn't have additional parameters after ":" sign
+                    ChatController.getInstance().stopChat();
+            default -> {
+                String error = "Unknown request was received from server:" + "\n" +
+                        "Command that was attempted to be invoked: " + message.getMessage();
+                LOGGER.log(Level.WARNING, error);
+            }
         }
     }
 

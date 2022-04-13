@@ -210,7 +210,7 @@ public class Server extends ChatMember {
     private void processActionMessage(Message message) {
         String action = message.getMessage().split(":")[0];
         switch (action) {
-            case "disconnect":
+            case "disconnect" -> {
                 //This command doesn't have additional parameters after ":" sign
                 disconnectClient(message.getUsername());
 
@@ -219,7 +219,12 @@ public class Server extends ChatMember {
                         , serverName, Message.MESSAGE_TYPE.STANDARD);
                 sendMessage(exitMessage);
                 appendMessageToChatBox(exitMessage);
-                break;
+            }
+            default -> {
+                String error = "Unknown request was received from server:" + "\n" +
+                        "Command that was attempted to be invoked: " + message.getMessage();
+                LOGGER.log(Level.WARNING, error);
+            }
         }
     }
 
