@@ -163,7 +163,7 @@ public class ClientServerTest extends ApplicationTest {
         assertEquals(CLIENT_COUNT, serverUserListBox.getItems().size());
 
         //Give server a while to process all messages
-        Thread.sleep(1000);
+        Thread.sleep(500);
 
         //Check if both clients and server have received their messages
         for (int x = 0; x < CLIENT_COUNT; x++) {
@@ -210,7 +210,7 @@ public class ClientServerTest extends ApplicationTest {
         }
 
         //Wait a while so that the server processes the 32 clients and their messages
-        Thread.sleep(300 * CLIENT_COUNT);
+        Thread.sleep(200 * CLIENT_COUNT);
 
         assertEquals(CLIENT_COUNT, serverUserListBox.getItems().size());
 
