@@ -4,6 +4,7 @@ import com.n3lx.chat.client.Client;
 import com.n3lx.chat.server.Server;
 import com.n3lx.chat.util.serverscanner.ServerScanner;
 import javafx.scene.control.ListView;
+import org.junit.Before;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
@@ -17,21 +18,32 @@ import static org.junit.Assert.assertTrue;
 
 public class ClientServerTest extends ApplicationTest {
 
+    private Server server;
+
+    private ListView<String> serverChatBox;
+    private ListView<String> serverUserListBox;
+    private ListView<String> clientChatBox;
+    private ListView<String> clientUserListBox;
+
+    @Before
+    public void initializeNewServerInstance() {
+        serverChatBox = new ListView<>();
+        serverUserListBox = new ListView<>();
+        clientChatBox = new ListView<>();
+        clientUserListBox = new ListView<>();
+
+        server = new Server("Test server", "", serverChatBox, serverUserListBox);
+    }
+
     @Test
     public void testHandshake() throws InterruptedException, TimeoutException {
-        var serverChatBox = new ListView<String>();
-        var serverUserListBox = new ListView<String>();
-        var clientChatBox = new ListView<String>();
-        var clientUserListBox = new ListView<String>();
-
-        Server server = new Server("Test server", "", serverChatBox, serverUserListBox);
         Client client = new Client("localhost", "Client", clientChatBox, clientUserListBox);
 
         server.start();
         client.start();
 
-        //Wait for 300ms for handshake to happen
-        Thread.sleep(300);
+        //Wait for handshake to happen
+        Thread.sleep(150);
 
         assertEquals(3, clientChatBox.getItems().size());
         assertEquals("Test server: Welcome to Test server", clientChatBox.getItems().get(0));
@@ -55,19 +67,13 @@ public class ClientServerTest extends ApplicationTest {
 
     @Test
     public void testClientSideDisconnection() throws InterruptedException, TimeoutException {
-        var serverChatBox = new ListView<String>();
-        var serverUserListBox = new ListView<String>();
-        var clientChatBox = new ListView<String>();
-        var clientUserListBox = new ListView<String>();
-
-        Server server = new Server("Test server", "", serverChatBox, serverUserListBox);
         Client client = new Client("localhost", "Client", clientChatBox, clientUserListBox);
 
         server.start();
         client.start();
 
-        //Wait for 300ms for handshake to happen
-        Thread.sleep(300);
+        //Wait for handshake to happen
+        Thread.sleep(150);
 
         client.stop();
 
@@ -87,19 +93,13 @@ public class ClientServerTest extends ApplicationTest {
 
     @Test
     public void testServerSideDisconnection() throws InterruptedException, TimeoutException {
-        var serverChatBox = new ListView<String>();
-        var serverUserListBox = new ListView<String>();
-        var clientChatBox = new ListView<String>();
-        var clientUserListBox = new ListView<String>();
-
-        Server server = new Server("Test server", "", serverChatBox, serverUserListBox);
         Client client = new Client("localhost", "Client", clientChatBox, clientUserListBox);
 
         server.start();
         client.start();
 
-        //Wait for 300ms for handshake to happen
-        Thread.sleep(300);
+        //Wait for handshake to happen
+        Thread.sleep(150);
 
         server.stop();
 
@@ -119,19 +119,13 @@ public class ClientServerTest extends ApplicationTest {
 
     @Test
     public void testUserListBoxAfterInvokingStopMethod() throws InterruptedException {
-        var serverChatBox = new ListView<String>();
-        var serverUserListBox = new ListView<String>();
-        var clientChatBox = new ListView<String>();
-        var clientUserListBox = new ListView<String>();
-
-        Server server = new Server("Test server", "", serverChatBox, serverUserListBox);
         Client client = new Client("localhost", "Client", clientChatBox, clientUserListBox);
 
         server.start();
         client.start();
 
-        //Wait for 300ms for handshake to happen
-        Thread.sleep(300);
+        //Wait for handshake to happen
+        Thread.sleep(150);
 
         server.stop();
         client.stop();
@@ -147,9 +141,6 @@ public class ClientServerTest extends ApplicationTest {
     public void testSendMessage() throws InterruptedException {
         final int CLIENT_COUNT = 16;
 
-        var serverChatBox = new ListView<String>();
-        var serverUserListBox = new ListView<String>();
-        Server server = new Server("Test server", "", serverChatBox, serverUserListBox);
         server.start();
 
         //Create a bunch of clients, connect them to the server and post a message
@@ -163,8 +154,8 @@ public class ClientServerTest extends ApplicationTest {
             clients.add(client);
             clientChatBoxes.add(clientChatBox);
 
-            //Wait for 200ms so that the client establishes the connection to the server
-            Thread.sleep(200);
+            //Wait so that the client establishes the connection to the server
+            Thread.sleep(150);
 
             client.sendMessage("test message");
         }
@@ -190,9 +181,6 @@ public class ClientServerTest extends ApplicationTest {
         final int CLIENT_COUNT = 32;
         ExecutorService executor = Executors.newFixedThreadPool(8);
 
-        var serverChatBox = new ListView<String>();
-        var serverUserListBox = new ListView<String>();
-        Server server = new Server("Test server", "", serverChatBox, serverUserListBox);
         server.start();
 
         //Create a bunch of clients, connect them to the server and post a message
@@ -204,9 +192,9 @@ public class ClientServerTest extends ApplicationTest {
             Runnable startClientAndSendMessage = () -> {
                 client.start();
 
-                //Wait for 200ms so that the client establishes the connection to the server
+                //Wait so that the client establishes the connection to the server
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(150);
                 } catch (InterruptedException ignored) {
 
                 }
@@ -222,7 +210,7 @@ public class ClientServerTest extends ApplicationTest {
         }
 
         //Wait a while so that the server processes the 32 clients and their messages
-        Thread.sleep(300 * CLIENT_COUNT);
+        Thread.sleep(200 * CLIENT_COUNT);
 
         assertEquals(CLIENT_COUNT, serverUserListBox.getItems().size());
 

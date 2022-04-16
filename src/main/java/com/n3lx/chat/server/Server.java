@@ -164,6 +164,13 @@ public class Server extends ChatMember {
                         appendMessageToChatBox(exitMessage);
                     }
                 }
+
+                //Wait before scanning for messages again to save computer's resources
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ignored) {
+
+                }
             }
         };
         serverThreads.submit(messageHandler);
